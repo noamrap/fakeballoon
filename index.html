@@ -3,462 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הפאזל של גיל</title>
+    <title>האקדמיה למתמטיקה של יעל</title>
     <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --success: #00b894;
+            --error: #d63031;
+            --background: #f1f2f6;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+        }
+
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
             margin: 0;
-            overflow: hidden;
-            background-color: #222;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-            font-family: 'Courier New', Courier, monospace;
-            user-select: none;
+            padding: 0;
+            line-height: 1.6;
         }
 
-        /* --- מסך הפאזל --- */
-        #game-section {
-            position: relative;
-            z-index: 10;
-            transition: all 0.1s;
-        }
-
-        h1 {
-            position: absolute;
-            top: 20px;
-            font-size: 3rem;
-            text-shadow: 2px 2px 0px #000;
-        }
-
-        canvas {
-            border: 4px solid #fff;
-            cursor: grab;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-
-        /* --- מסך הדו"ח הסופי (מוסתר בהתחלה) --- */
-        #final-report {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            z-index: 2000;
-            padding: 40px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            direction: ltr; /* דו"ח באנגלית נראה יותר מקצועי */
-        }
-
-        .report-header {
-            border-bottom: 2px solid #00ff00;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
-
-        .report-title {
-            color: #00ff00;
-            font-size: 2rem;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .report-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .data-category {
-            border: 1px solid #333;
-            padding: 15px;
-            background: #111;
-        }
-
-        .category-title {
-            color: #00ff00;
-            border-bottom: 1px solid #555;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-        }
-
-        .label {
-            color: #888;
-        }
-
-        .value {
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .warning {
-            color: red;
-        }
-
-        /* --- חלונות שגיאה מזויפים --- */
-        .fake-popup {
-            position: absolute;
-            width: 300px;
-            background: #d4d0c8;
-            border: 2px solid #fff;
-            border-right-color: #404040;
-            border-bottom-color: #404040;
-            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
-            z-index: 100;
-            font-family: Tahoma, sans-serif;
-            color: black;
-            display: flex;
-            flex-direction: column;
-            animation: popIn 0.1s ease-out;
-        }
-
-        @keyframes popIn {
-            from {
-                transform: scale(0);
-            }
-
-            to {
-                transform: scale(1);
-            }
-        }
-
-        .popup-header {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 4px;
-            font-weight: bold;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .popup-body {
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
             padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
         }
 
-        .popup-icon {
-            width: 32px;
-            height: 32px;
-            background: red;
-            border-radius: 50%;
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .score-container {
+            background: #fdcb6e;
+            color: #2d3436;
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .score-bump {
+            transform: scale(1.2);
+            background: #ffeaa7;
+        }
+
+        nav {
             display: flex;
             justify-content: center;
-            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 1.1em;
             font-weight: bold;
-            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        /* --- אנימציות כאוס --- */
-        .annoying-mode {
-            animation: shake 0.5s infinite;
-            cursor: none !important;
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
         }
 
-        @keyframes shake {
-            0% {
-                transform: translate(1px, 1px) rotate(0deg);
-            }
+        .section {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease;
+        }
 
-            10% {
-                transform: translate(-1px, -2px) rotate(-1deg);
-            }
+        .section.active {
+            display: block;
+        }
 
-            20% {
-                transform: translate(-3px, 0px) rotate(1deg);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-            30% {
-                transform: translate(3px, 2px) rotate(0deg);
-            }
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
 
-            40% {
-                transform: translate(1px, -1px) rotate(1deg);
-            }
+        .visual-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px dashed var(--secondary);
+        }
 
-            50% {
-                transform: translate(-1px, 2px) rotate(-1deg);
-            }
+        .visual-box svg {
+            max-width: 100%;
+            height: auto;
+        }
 
-            60% {
-                transform: translate(-3px, 1px) rotate(0deg);
-            }
+        .question-card {
+            background: white;
+            border: 1px solid #dfe6e9;
+            border-right: 6px solid var(--primary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative;
+        }
 
-            70% {
-                transform: translate(3px, 1px) rotate(-1deg);
-            }
+        .difficulty-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
 
-            80% {
-                transform: translate(-1px, -1px) rotate(1deg);
-            }
+        .diff-1 { background: #81ecec; color: #00cec9; }
+        .diff-2 { background: #fab1a0; color: #e17055; }
+        .diff-3 { background: #ff7675; color: #d63031; }
 
-            90% {
-                transform: translate(1px, 2px) rotate(0deg);
-            }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
 
-            100% {
-                transform: translate(1px, -2px) rotate(-1deg);
-            }
+        .option-btn {
+            background: white;
+            border: 2px solid #b2bec3;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #f8f9fa;
+        }
+
+        .option-btn.correct-ans {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .option-btn.wrong-ans {
+            background: var(--error);
+            color: white;
+            border-color: var(--error);
+        }
+
+        .feedback-msg {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1em;
+        }
+
+        .feedback-msg.success {
+            background: #e8f8f5;
+            color: #27ae60;
+            border-right: 4px solid #27ae60;
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .feedback-msg.error {
+            background: #fdedec;
+            color: #c0392b;
+            border-right: 4px solid #c0392b;
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .formula {
+            font-family: 'Courier New', Courier, monospace;
+            background: #eee;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
 
-    <div id="game-section">
-        <h1 id="main-title">הפאזל של גיל</h1>
-        <canvas id="puzzleCanvas"></canvas>
-    </div>
+<div class="container">
+    <header>
+        <h1>היי יעל! ברוכה הבאה לאקדמיה שלך 🎓</h1>
+        <p>כאן נלמד את כל החומר למבחן בצורה ויזואלית, ברורה וכיפית.</p>
+        <div class="score-container" id="score-display">נקודות שלך: 0 🏆</div>
+    </header>
 
-    <div id="final-report">
-        <div class="report-header">
-            <div class="report-title">SYSTEM COMPROMISED</div>
-            <div>TARGET ANALYSIS COMPLETE</div>
+    <nav>
+        <button class="nav-btn active" onclick="switchSection('pythagoras')">משפט פיתגורס</button>
+        <button class="nav-btn" onclick="switchSection('trig')">Sin, Cos, Tan</button>
+        <button class="nav-btn" onclick="switchSection('shift')">מציאת זווית (Shift)</button>
+        <button class="nav-btn" onclick="switchSection('stats')">סטטיסטיקה</button>
+    </nav>
+
+    <main id="pythagoras" class="section active">
+        <h2>משפט פיתגורס 📐</h2>
+        <div class="visual-box">
+            <h3>איך זה עובד?</h3>
+            <p>משפט פיתגורס אומר שבכל משולש ישר זווית, אם ניקח את שני הניצבים (הצלעות שיוצרות את הזווית הישרה), נעלה כל אחד מהם בריבוע ונחבר - נקבל בדיוק את היתר בריבוע!</p>
+            <p class="formula">a² + b² = c²</p>
+            <svg width="250" height="250" viewBox="-50 -50 200 200">
+                <polygon points="100,0 0,100 50,150 150,50" fill="#fab1a0" opacity="0.6"/>
+                <text x="75" y="75" fill="#d63031" font-weight="bold" transform="rotate(-45 75 75)">c² (יתר)</text>
+                <rect x="100" y="0" width="80" height="80" fill="#81ecec" opacity="0.6"/>
+                <text x="140" y="40" fill="#00cec9" font-weight="bold">a²</text>
+                <rect x="0" y="100" width="80" height="80" fill="#ffeaa7" opacity="0.6" transform="rotate(180 40 140)"/>
+                <text x="40" y="140" fill="#fdcb6e" font-weight="bold">b²</text>
+                <polygon points="0,100 100,100 100,0" fill="#74b9ff" stroke="#0984e3" stroke-width="2"/>
+                <polyline points="90,100 90,90 100,90" fill="none" stroke="black" stroke-width="2"/>
+            </svg>
+            <p>תראי בציור: השטח של הריבוע התכלת (a²) פלוס השטח של הריבוע הצהוב (b²) שווים ביחד לשטח של הריבוע האדום (c²)!</p>
         </div>
-        <div class="report-grid" id="report-content">
+        <div id="q-pythagoras"></div>
+    </main>
+
+    <main id="trig" class="section">
+        <h2>פונקציות טריגונומטריות: Sin, Cos, Tan 🔺</h2>
+        <div class="visual-box">
+            <h3>מה זה בכלל?</h3>
+            <p>במקום צלעות, עכשיו אנחנו מסתכלים על <span class="highlight">היחס</span> בין הצלעות בהתאם לזווית. יש מילת קסם שעוזרת לזכור הכל: <strong>סוה-קאה-טואה (SOH CAH TOA)</strong></p>
+            
+            <svg width="300" height="200" viewBox="0 0 300 200">
+                <polygon points="50,150 250,150 250,50" fill="#f1f2f6" stroke="#2d3436" stroke-width="3"/>
+                <polyline points="235,150 235,135 250,135" fill="none" stroke="black" stroke-width="2"/>
+                <path d="M 80,150 A 30,30 0 0,0 75,138" fill="none" stroke="#e84393" stroke-width="3"/>
+                <text x="90" y="145" fill="#e84393" font-weight="bold" font-size="20">α</text>
+                <text x="260" y="105" fill="#0984e3" font-weight="bold">ניצב מול</text>
+                <text x="120" y="175" fill="#00b894" font-weight="bold">ניצב ליד</text>
+                <text x="120" y="90" fill="#d63031" font-weight="bold" transform="rotate(-26 120 90)">יתר</text>
+            </svg>
+
+            <ul style="text-align: right; display: inline-block; list-style-type: none; padding: 0;">
+                <li><span class="formula">Sin</span> (סוה) = <span style="color:#0984e3">מול</span> / <span style="color:#d63031">יתר</span></li>
+                <li><span class="formula">Cos</span> (קאה) = <span style="color:#00b894">ליד</span> / <span style="color:#d63031">יתר</span></li>
+                <li><span class="formula">Tan</span> (טואה) = <span style="color:#0984e3">מול</span> / <span style="color:#00b894">ליד</span></li>
+            </ul>
         </div>
-        <div style="margin-top: 30px; color: red; font-size: 1.2rem; text-align: center; border: 1px solid red; padding: 10px;">
-            ALL DATA HAS BEEN UPLOADED TO REMOTE SERVER.
+        <div id="q-trig"></div>
+    </main>
+
+    <main id="shift" class="section">
+        <h2>למצוא את הזווית עם Shift 🔄</h2>
+        <div class="visual-box">
+            <h3>מתי משתמשים בזה?</h3>
+            <p>עד עכשיו, ידענו את הזווית וחיפשנו צלע. אבל מה קורה אם <strong>יש לנו שתי צלעות ואנחנו מחפשים את הזווית?</strong></p>
+            <p>כאן נכנס ה-<span class="highlight">Shift</span> במחשבון (נקרא גם הפונקציה ההפוכה: <code>sin⁻¹</code>, <code>cos⁻¹</code>, <code>tan⁻¹</code>).</p>
+            
+            <div style="background: white; border-radius: 10px; padding: 15px; display: inline-block; border: 2px solid #ccc;">
+                <p>לדוגמה: גילינו שהיחס של <strong>Sin</strong> הוא חצי (0.5).</p>
+                <p>במחשבון נלחץ:</p>
+                <p><kbd style="background: #f1c40f; padding: 5px 10px; border-radius: 5px;">SHIFT</kbd> ➔ <kbd style="background: #bdc3c7; padding: 5px 10px; border-radius: 5px;">sin</kbd> ➔ <kbd style="background: #bdc3c7; padding: 5px 10px; border-radius: 5px;">0.5</kbd> ➔ <kbd style="background: #2ecc71; padding: 5px 10px; border-radius: 5px;">=</kbd></p>
+                <p>והמחשבון יגיד לנו שהזווית היא <strong>30 מעלות!</strong></p>
+            </div>
         </div>
-    </div>
+        <div id="q-shift"></div>
+    </main>
 
-    <script>
-        // --- משתנים גלובליים ---
-        const canvas = document.getElementById('puzzleCanvas');
-        const ctx = canvas.getContext('2d');
-        const gameSection = document.getElementById('game-section');
-        const title = document.getElementById('main-title');
-        const finalReport = document.getElementById('final-report');
-        const reportContent = document.getElementById('report-content');
+    <main id="stats" class="section">
+        <h2>סטטיסטיקה: ממוצע וחציון 📊</h2>
+        <div class="visual-box">
+            <h3>מה ההבדל ביניהם?</h3>
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px;">
+                <div style="flex: 1; min-width: 200px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h4 style="color: #0984e3;">ממוצע</h4>
+                    <p>מחברים את כל המספרים יחד, ומחלקים בכמות המספרים שיש.</p>
+                    <p class="formula">(2 + 4 + 6) / 3 = 4</p>
+                    <p><em>כמו לחלק את כל הממתקים שווה בשווה בין כולם.</em></p>
+                </div>
+                <div style="flex: 1; min-width: 200px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h4 style="color: #00b894;">חציון</h4>
+                    <p>מסדרים את המספרים מהקטן לגדול, ובוחרים את המספר שיושב <strong>בדיוק באמצע</strong>.</p>
+                    <p>קבוצה: 9, 1, 5</p>
+                    <p>סידור: 1, <span style="background:#00b894; color:white; padding:2px 5px; border-radius:3px;">5</span>, 9 ➔ החציון הוא 5!</p>
+                </div>
+            </div>
+        </div>
+        <div id="q-stats"></div>
+    </main>
 
-        let isTrapActive = false;
-        let chaosIntervals = []; // לשמירת הטיימרים כדי שנוכל לעצור אותם
+</div>
 
-        // --- טעינת פאזל (קוד מקוצר) ---
-        const image = new Image();
-        image.src = 'img_0.jpg'; // וודא שם קובץ
-        image.onload = () => {
-            canvas.width = 400; canvas.height = 400;
-            ctx.drawImage(image, 0, 0, 400, 400);
-            ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2;
-            for (let i = 1; i < 4; i++) { ctx.strokeRect(i * 100, 0, 0, 400); ctx.strokeRect(0, i * 100, 400, 0); }
-        };
+<script>
+    // מערכת ניהול נקודות
+    let score = 0;
+    const scoreDisplay = document.getElementById('score-display');
 
-        // --- הטריגר הראשי ---
-        canvas.addEventListener('mousedown', async () => {
-            if (isTrapActive) return;
-            isTrapActive = true;
+    function updateScore(points) {
+        score += points;
+        scoreDisplay.textContent = `נקודות שלך: ${score} 🏆`;
+        scoreDisplay.classList.add('score-bump');
+        setTimeout(() => scoreDisplay.classList.remove('score-bump'), 300);
+    }
 
-            // 1. התחלת הכאוס
-            enterFullScreen();
-            startChaos();
+    // ניווט בין נושאים
+    function switchSection(sectionId) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(sectionId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
 
-            // 2. איסוף נתונים במקביל (לוקח כמה שניות)
-            const gatheredData = await collectAllData();
+    // מאגר שאלות מותאם ליעל
+    const quizData = {
+        pythagoras: [
+            {
+                q: "רמת חימום: במשולש ישר זווית, ניצב אחד שווה 3 והניצב השני שווה 4. כמה שווה היתר?",
+                options: ["5", "7", "25", "12"],
+                correct: 0,
+                difficulty: 1,
+                explanation: "טעות קטנה יעל. לפי הנוסחה: 3² + 4² שווה 9 + 16, שזה 25. היתר בריבוע הוא 25, ולכן היתר עצמו (השורש של 25) הוא 5."
+            },
+            {
+                q: "עולים שלב: היתר במשולש הוא 10. ניצב אחד שווה 6. מהו אורך הניצב השני?",
+                options: ["16", "64", "4", "8"],
+                correct: 3,
+                difficulty: 2,
+                explanation: "שימי לב, כאן נתון לנו היתר (c). לכן a² + 6² = 10². או במילים אחרות: 100 פחות 36 שווה 64. השורש של 64 הוא 8."
+            },
+            {
+                q: "אתגר: יש לנו משולש ישר זווית שבו שני הניצבים שווים באורכם. אורך כל ניצב הוא 5. כמה שווה היתר בערך?",
+                options: ["5", "10", "7.07", "25"],
+                correct: 2,
+                difficulty: 3,
+                explanation: "בואי נחשב ביחד: 5² + 5² = 25 + 25 = 50. היתר בריבוע הוא 50. שורש של 50 הוא בערך 7.07!"
+            }
+        ],
+        trig: [
+            {
+                q: "מתחילים קל: במשולש ישר זווית, הניצב ש*מול* הזווית הוא 3, והיתר הוא 5. מהי התוצאה של סינוס (Sin) הזווית?",
+                options: ["3/5", "5/3", "4/5", "3/4"],
+                correct: 0,
+                difficulty: 1,
+                explanation: "זוכרת את 'סוה'? Sin שווה ל-מול חלקי היתר. לכן התשובה היא 3 חלקי 5."
+            },
+            {
+                q: "ממשיכים: הניצב שלמול הזווית הוא 3, והניצב ש*ליד* הזווית הוא 4. איזו פונקציה תיתן לנו 3/4?",
+                options: ["Sin", "Cos", "Tan", "Shift"],
+                correct: 2,
+                difficulty: 2,
+                explanation: "היחס של מול חלקי ליד שייך לפונקציית הטנגנס (Tan). 'טואה' - טנגנס = מול / ליד."
+            },
+            {
+                q: "שאלת הבנה: נתון לנו ש- Cos של זווית מסוימת שווה ל- 0.5. ידוע גם שהיתר שווה 10. מה אורך הניצב שליד הזווית?",
+                options: ["20", "5", "0.5", "10"],
+                correct: 1,
+                difficulty: 3,
+                explanation: "קצת טריקי! Cos זה 'ליד חלקי יתר'. אז 'ניצב ליד' חלקי 10 שווה 0.5. כדי למצוא את הניצב, נכפיל 10 ב-0.5 ונקבל 5."
+            }
+        ],
+        shift: [
+            {
+                q: "בסיס: חישבת ומצאת ש- Sin(α) = 0.5. איך תמצאי במחשבון את הזווית α?",
+                options: ["לחלק ל-0.5", "ללחוץ SHIFT ואז Sin ואז 0.5", "ללחוץ Sin ואז 0.5", "להכפיל ב-2"],
+                correct: 1,
+                difficulty: 1,
+                explanation: "כשאנחנו יודעים את התוצאה ומחפשים את הזווית, *חובה* להשתמש ב-SHIFT (הפונקציה ההפוכה) לפני ה-Sin."
+            },
+            {
+                q: "יישום: במשולש, הניצב *מול* הזווית שווה 5 והיתר שווה 10. מה גודל הזווית?",
+                options: ["30 מעלות", "60 מעלות", "45 מעלות", "2 מעלות"],
+                correct: 0,
+                difficulty: 2,
+                explanation: "קודם נמצא את היחס: מול חלקי יתר (Sin) זה 5/10 שזה חצי. עכשיו במחשבון: Shift Sin של 0.5 ייתן לך בדיוק 30 מעלות!"
+            },
+            {
+                q: "שילוב: הניצב ממול שווה 4, והניצב שליד שווה 4. באיזו פעולה תשתמשי כדי למצוא את הזווית?",
+                options: ["Shift Sin (4/4)", "Shift Cos (4/4)", "Shift Tan (4/4)", "רק Tan (4/4)"],
+                correct: 2,
+                difficulty: 3,
+                explanation: "יש לנו את 'מול' ואת 'ליד', לכן נשתמש ב-Tan. וכיוון שאנחנו מחפשים זווית, חייבים Shift! לכן Shift Tan (4/4)."
+            }
+        ],
+        stats: [
+            {
+                q: "ממוצע קליל: מה הממוצע של המספרים 2, 4 ו-6?",
+                options: ["4", "3", "12", "6"],
+                correct: 0,
+                difficulty: 1,
+                explanation: "לחישוב ממוצע נחבר את כולם: 2+4+6 = 12. יש לנו 3 מספרים, אז 12 לחלק ל-3 נותן 4."
+            },
+            {
+                q: "חציון: מהו החציון של קבוצת המספרים הבאה: 1, 9, 3, 7, 5?",
+                options: ["9", "5", "3", "25"],
+                correct: 1,
+                difficulty: 2,
+                explanation: "כדי למצוא חציון חייבים קודם לסדר מהקטן לגדול! 1, 3, 5, 7, 9. המספר שיושב בדיוק באמצע הוא 5."
+            },
+            {
+                q: "חשיבה קדימה: יעל קיבלה במבחן הראשון 80 ובמבחן השני 100. איזה ציון היא צריכה לקבל במבחן השלישי כדי שהממוצע הסופי שלה יהיה בדיוק 90?",
+                options: ["80", "100", "90", "85"],
+                correct: 2,
+                difficulty: 3,
+                explanation: "הממוצע של 80 ו-100 הוא כבר 90. לכן, כל עוד המבחן הנוסף יהיה 90, הממוצע יישאר בדיוק 90! חישוב: (80+100+90) חלקי 3 שווה 270 חלקי 3 שווה 90."
+            }
+        ]
+    };
 
-            // 3. עצירת הכאוס והצגת הדו"ח אחרי 8 שניות
-            setTimeout(() => {
-                stopChaos();
-                showFinalReport(gatheredData);
-            }, 8000);
+    // בניית השאלות על המסך
+    function renderQuestions() {
+        for (const topic in quizData) {
+            const container = document.getElementById(`q-${topic}`);
+            quizData[topic].forEach((q, index) => {
+                const diffLabels = ['קל', 'בינוני', 'מאתגר'];
+                
+                let html = `
+                    <div class="question-card" id="${topic}-card-${index}">
+                        <div class="difficulty-badge diff-${q.difficulty}">רמה: ${diffLabels[q.difficulty-1]}</div>
+                        <h4 style="margin-top:20px;">${q.q}</h4>
+                        <div class="options-grid">
+                `;
+                
+                q.options.forEach((opt, optIndex) => {
+                    html += `<button class="option-btn" onclick="checkAnswer('${topic}', ${index}, ${optIndex}, this)">${opt}</button>`;
+                });
+                
+                html += `
+                        </div>
+                        <div class="feedback-msg" id="feedback-${topic}-${index}"></div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+    }
+
+    // בדיקת התשובה של יעל
+    function checkAnswer(topic, qIndex, selectedOpt, btnElement) {
+        const question = quizData[topic][qIndex];
+        const card = document.getElementById(`${topic}-card-${qIndex}`);
+        const feedback = document.getElementById(`feedback-${topic}-${qIndex}`);
+        
+        // Disable all buttons in this question
+        const buttons = card.querySelectorAll('.option-btn');
+        buttons.forEach(b => {
+            b.disabled = true;
+            b.style.cursor = 'not-allowed';
+            b.style.opacity = '0.7';
         });
 
-        // --- פונקציית איסוף הנתונים הגדולה ---
-        async function collectAllData() {
-            let data = {
-                network: {},
-                hardware: {},
-                software: {},
-                screen: {}
-            };
-
-            // רשת (IP)
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const json = await res.json();
-                data.network.ip = json.ip;
-            } catch (e) { data.network.ip = "Hidden / Firewall Detected"; }
-
-            // נסיון לזהות חיבור
-            if (navigator.connection) {
-                data.network.type = navigator.connection.effectiveType || "Unknown";
-                data.network.rtt = navigator.connection.rtt + "ms";
-            }
-
-            // חומרה (סוללה)
-            try {
-                if (navigator.getBattery) {
-                    const batt = await navigator.getBattery();
-                    data.hardware.battery = Math.round(batt.level * 100) + "%";
-                    data.hardware.charging = batt.charging ? "Yes" : "No";
-                } else { data.hardware.battery = "Desktop / N/A"; }
-            } catch (e) { data.hardware.battery = "Protected"; }
-
-            // חומרה (זיכרון וליבות)
-            data.hardware.memory = navigator.deviceMemory ? `~${navigator.deviceMemory} GB` : "Unknown";
-            data.hardware.cores = navigator.hardwareConcurrency || "Unknown";
-
-            // כרטיס מסך (GPU) - טריק מתקדם
-            data.hardware.gpu = getGPUInfo();
-
-            // תוכנה
-            data.software.os = getOS();
-            data.software.browser = getBrowser();
-            data.software.language = navigator.language;
-            data.software.cookies = navigator.cookieEnabled ? "Enabled" : "Disabled";
-            data.software.platform = navigator.platform;
-
-            // מסך
-            data.screen.res = `${window.screen.width} x ${window.screen.height}`;
-            data.screen.depth = `${window.screen.colorDepth}-bit`;
-            data.screen.pixelRatio = window.devicePixelRatio;
-
-            return data;
+        if (selectedOpt === question.correct) {
+            // Correct Answer
+            btnElement.classList.add('correct-ans');
+            feedback.className = 'feedback-msg success';
+            feedback.textContent = 'אלופה יעל! תשובה מדויקת! 🎉 (+10 נקודות)';
+            updateScore(10);
+        } else {
+            // Wrong Answer
+            btnElement.classList.add('wrong-ans');
+            buttons[question.correct].classList.add('correct-ans'); // Show correct one
+            feedback.className = 'feedback-msg error';
+            feedback.innerHTML = `<strong>לא נורא, לומדים מזה!</strong><br>${question.explanation}`;
         }
+    }
 
-        // --- פונקציות עזר לאיסוף ---
-        function getGPUInfo() {
-            try {
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-            } catch (e) { return "Integrated Graphics / Unknown"; }
-        }
+    // הפעלה ראשונית
+    window.onload = renderQuestions;
+</script>
 
-        function getOS() {
-            const ua = navigator.userAgent;
-            if (ua.indexOf("Win") !== -1) return "Windows";
-            if (ua.indexOf("Mac") !== -1) return "macOS";
-            if (ua.indexOf("Linux") !== -1) return "Linux";
-            if (ua.indexOf("Android") !== -1) return "Android";
-            if (ua.indexOf("iPhone") !== -1) return "iOS";
-            return "Unknown System";
-        }
-
-        function getBrowser() {
-            if (navigator.userAgent.indexOf("Chrome") !== -1) return "Chrome / Chromium";
-            if (navigator.userAgent.indexOf("Firefox") !== -1) return "Mozilla Firefox";
-            if (navigator.userAgent.indexOf("Safari") !== -1) return "Apple Safari";
-            return "Unknown Browser";
-        }
-
-        // --- ניהול הכאוס ---
-        function startChaos() {
-            document.body.classList.add('annoying-mode');
-
-            // חלונות שגיאה
-            const popupInterval = setInterval(spawnErrorBox, 200);
-            chaosIntervals.push(popupInterval);
-
-            // צבעים ורעידות
-            const colorInterval = setInterval(() => {
-                document.body.style.backgroundColor = Math.random() > 0.5 ? '#200' : '#000';
-                title.style.color = Math.random() > 0.5 ? 'red' : 'yellow';
-                title.innerText = "SYSTEM CRITICAL ERROR";
-            }, 100);
-            chaosIntervals.push(colorInterval);
-        }
-
-        function stopChaos() {
-            // ניקוי כל הטיימרים
-            chaosIntervals.forEach(clearInterval);
-            document.body.classList.remove('annoying-mode');
-            document.body.style.backgroundColor = '#000';
-            document.body.style.cursor = 'default';
-
-            // מחיקת כל החלונות המזויפים
-            document.querySelectorAll('.fake-popup').forEach(el => el.remove());
-
-            // הסתרת המשחק
-            gameSection.style.display = 'none';
-        }
-
-        // --- הצגת הדו"ח הסופי ---
-        function showFinalReport(data) {
-            finalReport.style.display = 'block';
-
-            // בניית ה-HTML של הדו"ח
-            const html = `
-                    <div class="data-category">
-                        <div class="category-title">NETWORK INTELLIGENCE</div>
-                        ${row("Public IP", data.network.ip, true)}
-                        ${row("Connection Type", data.network.type)}
-                        ${row("Latency (RTT)", data.network.rtt)}
-                    </div>
-
-                    <div class="data-category">
-                        <div class="category-title">DEVICE HARDWARE</div>
-                        ${row("GPU Renderer", data.hardware.gpu)}
-                        ${row("CPU Cores", data.hardware.cores)}
-                        ${row("RAM Memory", data.hardware.memory)}
-                        ${row("Battery Level", data.hardware.battery, parseInt(data.hardware.battery) < 20)}
-                        ${row("Charging Status", data.hardware.charging)}
-                    </div>
-
-                    <div class="data-category">
-                        <div class="category-title">SOFTWARE FINGERPRINT</div>
-                        ${row("Operating System", data.software.os)}
-                        ${row("Browser Engine", data.software.browser)}
-                        ${row("Platform ID", data.software.platform)}
-                        ${row("System Language", data.software.language)}
-                    </div>
-
-                    <div class="data-category">
-                        <div class="category-title">DISPLAY & TRACKING</div>
-                        ${row("Screen Resolution", data.screen.res)}
-                        ${row("Color Depth", data.screen.depth)}
-                        ${row("Cookies Enabled", data.software.cookies)}
-                        ${row("Timezone", Intl.DateTimeFormat().resolvedOptions().timeZone)}
-                    </div>
-                `;
-
-            reportContent.innerHTML = html;
-        }
-
-        function row(label, value, isWarning = false) {
-            return `
-                    <div class="data-row">
-                        <span class="label">${label}:</span>
-                        <span class="value ${isWarning ? 'warning' : ''}">${value}</span>
-                    </div>
-                `;
-        }
-
-        function spawnErrorBox() {
-            // (אותו קוד מהגרסה הקודמת ליצירת חלונות)
-            const popup = document.createElement('div');
-            popup.className = 'fake-popup';
-            popup.style.left = Math.random() * (window.innerWidth - 300) + 'px';
-            popup.style.top = Math.random() * (window.innerHeight - 150) + 'px';
-            popup.innerHTML = `<div class="popup-header"><span>Error 0x${Math.floor(Math.random() * 9999)}</span><span>X</span></div><div class="popup-body"><div class="popup-icon">!</div><div>Fatal Exception Occurred</div></div>`;
-            document.body.appendChild(popup);
-        }
-
-        function enterFullScreen() {
-            const el = document.documentElement;
-            if (el.requestFullscreen) el.requestFullscreen();
-        }
-
-        // מניעת יציאה
-        window.onbeforeunload = () => "System Halted.";
-        document.addEventListener('contextmenu', e => e.preventDefault());
-
-    </script>
 </body>
 </html>
