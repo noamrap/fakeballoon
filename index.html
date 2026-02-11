@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>האקדמיה למתמטיקה של יעל</title>
+    <title>האקדמיה למתמטיקה של יעל - שלב ב'</title>
     <style>
         :root {
             --primary: #6c5ce7;
@@ -235,8 +235,8 @@
 
 <div class="container">
     <header>
-        <h1>היי יעל! ברוכה הבאה לאקדמיה שלך 🎓</h1>
-        <p>כאן נלמד את כל החומר למבחן בצורה ויזואלית, ברורה וכיפית.</p>
+        <h1>האקדמיה של יעל - שלב ב' 🚀</h1>
+        <p>יותר שאלות, יותר אתגרים, והכנה מושלמת למבחן!</p>
         <div class="score-container" id="score-display">נקודות שלך: 0 🏆</div>
     </header>
 
@@ -250,84 +250,48 @@
     <main id="pythagoras" class="section active">
         <h2>משפט פיתגורס 📐</h2>
         <div class="visual-box">
-            <h3>איך זה עובד?</h3>
-            <p>משפט פיתגורס אומר שבכל משולש ישר זווית, אם ניקח את שני הניצבים (הצלעות שיוצרות את הזווית הישרה), נעלה כל אחד מהם בריבוע ונחבר - נקבל בדיוק את היתר בריבוע!</p>
-            <p class="formula">a² + b² = c²</p>
-            <svg width="250" height="250" viewBox="-50 -50 200 200">
-                <polygon points="100,0 0,100 50,150 150,50" fill="#fab1a0" opacity="0.6"/>
-                <text x="75" y="75" fill="#d63031" font-weight="bold" transform="rotate(-45 75 75)">c² (יתר)</text>
-                <rect x="100" y="0" width="80" height="80" fill="#81ecec" opacity="0.6"/>
-                <text x="140" y="40" fill="#00cec9" font-weight="bold">a²</text>
-                <rect x="0" y="100" width="80" height="80" fill="#ffeaa7" opacity="0.6" transform="rotate(180 40 140)"/>
-                <text x="40" y="140" fill="#fdcb6e" font-weight="bold">b²</text>
-                <polygon points="0,100 100,100 100,0" fill="#74b9ff" stroke="#0984e3" stroke-width="2"/>
-                <polyline points="90,100 90,90 100,90" fill="none" stroke="black" stroke-width="2"/>
+            <h3>תזכורת ויזואלית</h3>
+            <p>השטח של שני הריבועים הקטנים (על הניצבים) שווה בדיוק לשטח הריבוע הגדול (על היתר).</p>
+            <p class="formula">ניצב² + ניצב² = יתר²</p>
+            <svg width="200" height="200" viewBox="0 0 200 200">
+                <rect x="50" y="50" width="100" height="100" fill="none" stroke="#ccc" stroke-dasharray="5,5"/>
+                <polygon points="50,150 150,150 50,50" fill="#74b9ff" stroke="#0984e3" stroke-width="2"/>
+                <text x="70" y="140" font-size="20">a</text>
+                <text x="90" y="165" font-size="20">b</text>
+                <text x="100" y="100" font-size="20" fill="red">c</text>
             </svg>
-            <p>תראי בציור: השטח של הריבוע התכלת (a²) פלוס השטח של הריבוע הצהוב (b²) שווים ביחד לשטח של הריבוע האדום (c²)!</p>
         </div>
         <div id="q-pythagoras"></div>
     </main>
 
     <main id="trig" class="section">
-        <h2>פונקציות טריגונומטריות: Sin, Cos, Tan 🔺</h2>
+        <h2>פונקציות טריגונומטריות 🔺</h2>
         <div class="visual-box">
-            <h3>מה זה בכלל?</h3>
-            <p>במקום צלעות, עכשיו אנחנו מסתכלים על <span class="highlight">היחס</span> בין הצלעות בהתאם לזווית. יש מילת קסם שעוזרת לזכור הכל: <strong>סוה-קאה-טואה (SOH CAH TOA)</strong></p>
-            
-            <svg width="300" height="200" viewBox="0 0 300 200">
-                <polygon points="50,150 250,150 250,50" fill="#f1f2f6" stroke="#2d3436" stroke-width="3"/>
-                <polyline points="235,150 235,135 250,135" fill="none" stroke="black" stroke-width="2"/>
-                <path d="M 80,150 A 30,30 0 0,0 75,138" fill="none" stroke="#e84393" stroke-width="3"/>
-                <text x="90" y="145" fill="#e84393" font-weight="bold" font-size="20">α</text>
-                <text x="260" y="105" fill="#0984e3" font-weight="bold">ניצב מול</text>
-                <text x="120" y="175" fill="#00b894" font-weight="bold">ניצב ליד</text>
-                <text x="120" y="90" fill="#d63031" font-weight="bold" transform="rotate(-26 120 90)">יתר</text>
-            </svg>
-
-            <ul style="text-align: right; display: inline-block; list-style-type: none; padding: 0;">
-                <li><span class="formula">Sin</span> (סוה) = <span style="color:#0984e3">מול</span> / <span style="color:#d63031">יתר</span></li>
-                <li><span class="formula">Cos</span> (קאה) = <span style="color:#00b894">ליד</span> / <span style="color:#d63031">יתר</span></li>
-                <li><span class="formula">Tan</span> (טואה) = <span style="color:#0984e3">מול</span> / <span style="color:#00b894">ליד</span></li>
-            </ul>
+            <h3>SOH - CAH - TOA</h3>
+            <p>זוכרת את ראשי התיבות?</p>
+            <div style="display: flex; justify-content: center; gap: 20px; font-weight: bold;">
+                <div style="background: #e8f8f5; padding: 10px; border-radius: 8px; color: #00b894;">Sin = מול/יתר</div>
+                <div style="background: #e8f8f5; padding: 10px; border-radius: 8px; color: #0984e3;">Cos = ליד/יתר</div>
+                <div style="background: #e8f8f5; padding: 10px; border-radius: 8px; color: #d63031;">Tan = מול/ליד</div>
+            </div>
         </div>
         <div id="q-trig"></div>
     </main>
 
     <main id="shift" class="section">
-        <h2>למצוא את הזווית עם Shift 🔄</h2>
+        <h2>מציאת זווית (Shift) 🔄</h2>
         <div class="visual-box">
-            <h3>מתי משתמשים בזה?</h3>
-            <p>עד עכשיו, ידענו את הזווית וחיפשנו צלע. אבל מה קורה אם <strong>יש לנו שתי צלעות ואנחנו מחפשים את הזווית?</strong></p>
-            <p>כאן נכנס ה-<span class="highlight">Shift</span> במחשבון (נקרא גם הפונקציה ההפוכה: <code>sin⁻¹</code>, <code>cos⁻¹</code>, <code>tan⁻¹</code>).</p>
-            
-            <div style="background: white; border-radius: 10px; padding: 15px; display: inline-block; border: 2px solid #ccc;">
-                <p>לדוגמה: גילינו שהיחס של <strong>Sin</strong> הוא חצי (0.5).</p>
-                <p>במחשבון נלחץ:</p>
-                <p><kbd style="background: #f1c40f; padding: 5px 10px; border-radius: 5px;">SHIFT</kbd> ➔ <kbd style="background: #bdc3c7; padding: 5px 10px; border-radius: 5px;">sin</kbd> ➔ <kbd style="background: #bdc3c7; padding: 5px 10px; border-radius: 5px;">0.5</kbd> ➔ <kbd style="background: #2ecc71; padding: 5px 10px; border-radius: 5px;">=</kbd></p>
-                <p>והמחשבון יגיד לנו שהזווית היא <strong>30 מעלות!</strong></p>
-            </div>
+            <p>לוחצים על Shift כשיודעים את <strong>אורך הצלעות</strong> ורוצים לגלות את <strong>הזווית</strong>.</p>
+            <p>במחשבון זה נראה כך: <span class="formula">sin⁻¹</span></p>
         </div>
         <div id="q-shift"></div>
     </main>
 
     <main id="stats" class="section">
-        <h2>סטטיסטיקה: ממוצע וחציון 📊</h2>
+        <h2>סטטיסטיקה 📊</h2>
         <div class="visual-box">
-            <h3>מה ההבדל ביניהם?</h3>
-            <div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px;">
-                <div style="flex: 1; min-width: 200px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <h4 style="color: #0984e3;">ממוצע</h4>
-                    <p>מחברים את כל המספרים יחד, ומחלקים בכמות המספרים שיש.</p>
-                    <p class="formula">(2 + 4 + 6) / 3 = 4</p>
-                    <p><em>כמו לחלק את כל הממתקים שווה בשווה בין כולם.</em></p>
-                </div>
-                <div style="flex: 1; min-width: 200px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <h4 style="color: #00b894;">חציון</h4>
-                    <p>מסדרים את המספרים מהקטן לגדול, ובוחרים את המספר שיושב <strong>בדיוק באמצע</strong>.</p>
-                    <p>קבוצה: 9, 1, 5</p>
-                    <p>סידור: 1, <span style="background:#00b894; color:white; padding:2px 5px; border-radius:3px;">5</span>, 9 ➔ החציון הוא 5!</p>
-                </div>
-            </div>
+            <p><strong>ממוצע:</strong> סכום הכל חלקי הכמות.</p>
+            <p><strong>חציון:</strong> האיבר האמצעי (אחרי סידור מהקטן לגדול!).</p>
         </div>
         <div id="q-stats"></div>
     </main>
@@ -335,7 +299,6 @@
 </div>
 
 <script>
-    // מערכת ניהול נקודות
     let score = 0;
     const scoreDisplay = document.getElementById('score-display');
 
@@ -346,115 +309,165 @@
         setTimeout(() => scoreDisplay.classList.remove('score-bump'), 300);
     }
 
-    // ניווט בין נושאים
     function switchSection(sectionId) {
         document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        
         document.getElementById(sectionId).classList.add('active');
         event.currentTarget.classList.add('active');
     }
 
-    // מאגר שאלות מותאם ליעל
+    // המאגר המורחב - חלק ב'
     const quizData = {
         pythagoras: [
             {
-                q: "רמת חימום: במשולש ישר זווית, ניצב אחד שווה 3 והניצב השני שווה 4. כמה שווה היתר?",
-                options: ["5", "7", "25", "12"],
+                q: "חימום: צלעות הניצבים הן 6 ו-8. מה אורך היתר?",
+                options: ["10", "14", "48", "100"],
                 correct: 0,
                 difficulty: 1,
-                explanation: "טעות קטנה יעל. לפי הנוסחה: 3² + 4² שווה 9 + 16, שזה 25. היתר בריבוע הוא 25, ולכן היתר עצמו (השורש של 25) הוא 5."
+                explanation: "מעולה! 6 בריבוע (36) ועוד 8 בריבוע (64) שווה 100. שורש של 100 הוא 10."
             },
             {
-                q: "עולים שלב: היתר במשולש הוא 10. ניצב אחד שווה 6. מהו אורך הניצב השני?",
-                options: ["16", "64", "4", "8"],
-                correct: 3,
+                q: "הבנה: האם ייתכן משולש ישר זווית עם הצלעות: 3, 4, 6?",
+                options: ["כן, בטח", "לא", "רק אם ה-6 הוא ניצב", "אי אפשר לדעת"],
+                correct: 1,
                 difficulty: 2,
-                explanation: "שימי לב, כאן נתון לנו היתר (c). לכן a² + 6² = 10². או במילים אחרות: 100 פחות 36 שווה 64. השורש של 64 הוא 8."
+                explanation: "נבדוק: 3 בריבוע (9) ועוד 4 בריבוע (16) שווה 25. אבל היתר הוא 6, ו-6 בריבוע זה 36. 25 לא שווה ל-36, אז זה לא משולש ישר זווית!"
             },
             {
-                q: "אתגר: יש לנו משולש ישר זווית שבו שני הניצבים שווים באורכם. אורך כל ניצב הוא 5. כמה שווה היתר בערך?",
-                options: ["5", "10", "7.07", "25"],
+                q: "חישוב הפוך: היתר הוא 13, ניצב אחד הוא 5. מה אורך הניצב השני?",
+                options: ["18", "8", "12", "144"],
+                correct: 2,
+                difficulty: 2,
+                explanation: "מצוין. 13 בריבוע (169) פחות 5 בריבוע (25) שווה 144. השורש של 144 הוא 12."
+            },
+            {
+                q: "מהחיים: סולם באורך 10 מטר נשען על קיר. הרגליים של הסולם רחוקות 6 מטר מהקיר. לאיזה גובה מגיע הסולם?",
+                options: ["4 מטר", "16 מטר", "8 מטר", "60 מטר"],
                 correct: 2,
                 difficulty: 3,
-                explanation: "בואי נחשב ביחד: 5² + 5² = 25 + 25 = 50. היתר בריבוע הוא 50. שורש של 50 הוא בערך 7.07!"
+                explanation: "זה בדיוק פיתגורס! הסולם הוא היתר (10). המרחק מהקיר הוא ניצב (6). הגובה הוא הניצב החסר. 100 פחות 36 זה 64. שורש 64 זה 8."
+            },
+             {
+                q: "גיאומטריה: מלבן שאורכו 3 ס\"מ ורוחבו 4 ס\"מ. מה אורך האלכסון שלו?",
+                options: ["7 ס\"מ", "5 ס\"מ", "12 ס\"מ", "3.5 ס\"מ"],
+                correct: 1,
+                difficulty: 3,
+                explanation: "אלכסון של מלבן מחלק אותו לשני משולשים ישרי זווית! הניצבים הם 3 ו-4. היתר (האלכסון) יהיה 5."
             }
         ],
         trig: [
             {
-                q: "מתחילים קל: במשולש ישר זווית, הניצב ש*מול* הזווית הוא 3, והיתר הוא 5. מהי התוצאה של סינוס (Sin) הזווית?",
-                options: ["3/5", "5/3", "4/5", "3/4"],
-                correct: 0,
+                q: "תיאוריה: איזו פונקציה מחשבת יחס בין הניצב ש*ליד* הזווית ליתר?",
+                options: ["Sin", "Cos", "Tan", "Shift"],
+                correct: 1,
                 difficulty: 1,
-                explanation: "זוכרת את 'סוה'? Sin שווה ל-מול חלקי היתר. לכן התשובה היא 3 חלקי 5."
+                explanation: "CAH - Cosine Adjacent Hypotenuse. כלומר קוסינוס זה ליד חלקי יתר."
             },
             {
-                q: "ממשיכים: הניצב שלמול הזווית הוא 3, והניצב ש*ליד* הזווית הוא 4. איזו פונקציה תיתן לנו 3/4?",
-                options: ["Sin", "Cos", "Tan", "Shift"],
+                q: "זיהוי: נתון משולש. יש לי את הניצב שמול הזווית ואת הניצב שליד הזווית. באיזו פונקציה אשתמש?",
+                options: ["Sin", "Cos", "Tan", "פיתגורס"],
                 correct: 2,
                 difficulty: 2,
-                explanation: "היחס של מול חלקי ליד שייך לפונקציית הטנגנס (Tan). 'טואה' - טנגנס = מול / ליד."
+                explanation: "יש לך מול ו-ליד? זה הזמן ל-Tan! (טנגנס)."
             },
             {
-                q: "שאלת הבנה: נתון לנו ש- Cos של זווית מסוימת שווה ל- 0.5. ידוע גם שהיתר שווה 10. מה אורך הניצב שליד הזווית?",
-                options: ["20", "5", "0.5", "10"],
+                q: "חישוב: נתון Sin(x) = 0.5. היתר הוא 20. מה אורך הניצב שמול הזווית?",
+                options: ["40", "10", "5", "100"],
                 correct: 1,
+                difficulty: 2,
+                explanation: "סינוס זה 'מול חלקי יתר'. אם התוצאה היא חצי (0.5), והיתר הוא 20, אז הניצב שמול חייב להיות חצי מ-20, שזה 10."
+            },
+            {
+                q: "מחשבון: כמה זה Cos(60) במחשבון?",
+                options: ["0.866", "1", "0.5", "0"],
+                correct: 2,
+                difficulty: 1,
+                explanation: "זו זווית מפורסמת! קוסינוס של 60 מעלות שווה בדיוק לחצי (0.5)."
+            },
+            {
+                q: "אתגר: זווית שגודלה 45 מעלות במשולש ישר זווית. מה אנחנו יודעים על הניצבים?",
+                options: ["הם שווים באורכם", "הניצב שמול גדול יותר", "הניצב שליד גדול יותר", "אי אפשר לדעת"],
+                correct: 0,
                 difficulty: 3,
-                explanation: "קצת טריקי! Cos זה 'ליד חלקי יתר'. אז 'ניצב ליד' חלקי 10 שווה 0.5. כדי למצוא את הניצב, נכפיל 10 ב-0.5 ונקבל 5."
+                explanation: "נכון! אם זווית אחת היא 45, גם השנייה 45. זה משולש שווה שוקיים והניצבים שווים. (Tan 45 = 1)."
             }
         ],
         shift: [
             {
-                q: "בסיס: חישבת ומצאת ש- Sin(α) = 0.5. איך תמצאי במחשבון את הזווית α?",
-                options: ["לחלק ל-0.5", "ללחוץ SHIFT ואז Sin ואז 0.5", "ללחוץ Sin ואז 0.5", "להכפיל ב-2"],
+                q: "מתי לוחצים? מתי משתמשים ב-SHIFT במחשבון?",
+                options: ["כדי לחשב אורך צלע", "כדי לחשב את גודל הזווית", "כדי לחשב שטח", "כשרוצים לכבות את המחשבון"],
                 correct: 1,
                 difficulty: 1,
-                explanation: "כשאנחנו יודעים את התוצאה ומחפשים את הזווית, *חובה* להשתמש ב-SHIFT (הפונקציה ההפוכה) לפני ה-Sin."
+                explanation: "בדיוק. Shift (פעולה הפוכה) נועדה לגלות את הזווית כשיש לנו כבר את היחס בין הצלעות."
             },
             {
-                q: "יישום: במשולש, הניצב *מול* הזווית שווה 5 והיתר שווה 10. מה גודל הזווית?",
-                options: ["30 מעלות", "60 מעלות", "45 מעלות", "2 מעלות"],
-                correct: 0,
-                difficulty: 2,
-                explanation: "קודם נמצא את היחס: מול חלקי יתר (Sin) זה 5/10 שזה חצי. עכשיו במחשבון: Shift Sin של 0.5 ייתן לך בדיוק 30 מעלות!"
-            },
-            {
-                q: "שילוב: הניצב ממול שווה 4, והניצב שליד שווה 4. באיזו פעולה תשתמשי כדי למצוא את הזווית?",
-                options: ["Shift Sin (4/4)", "Shift Cos (4/4)", "Shift Tan (4/4)", "רק Tan (4/4)"],
+                q: "סימון מתמטי: מה המשמעות של sin⁻¹ על כפתור המחשבון?",
+                options: ["אחד חלקי סינוס", "סינוס בחזקת מינוס אחד", "הפונקציה ההפוכה לסינוס (מציאת זווית)", "סינוס של מספר שלילי"],
                 correct: 2,
+                difficulty: 2,
+                explanation: "המינוס אחד הקטן מסמל 'פונקציה הפוכה'. הפעולה שמבטלת את הסינוס ומחזירה לנו את הזווית."
+            },
+            {
+                q: "תרגול: יצא לי ש- Tan(x) = 1. מה הזווית?",
+                options: ["90", "0", "45", "30"],
+                correct: 2,
+                difficulty: 2,
+                explanation: "Shift Tan של 1 נותן 45 מעלות. זה אומר שהניצב מול והניצב ליד שווים באורכם."
+            },
+            {
+                q: "מכשול: ניסיתי לחשב Shift Sin של המספר 1.5 והמחשבון כתב ERROR. למה?",
+                options: ["המחשבון מקולקל", "סינוס וקוסינוס לא יכולים להיות גדולים מ-1", "צריך ללחוץ פעמיים", "הזווית גדולה מדי"],
+                correct: 1,
                 difficulty: 3,
-                explanation: "יש לנו את 'מול' ואת 'ליד', לכן נשתמש ב-Tan. וכיוון שאנחנו מחפשים זווית, חייבים Shift! לכן Shift Tan (4/4)."
+                explanation: "שאלה מעולה! היתר הוא תמיד הצלע הכי ארוכה. לכן היחס (מול/יתר) חייב להיות קטן מ-1 (או שווה לו). אי אפשר לעשות Shift Sin למספר גדול מ-1."
             }
         ],
         stats: [
             {
-                q: "ממוצע קליל: מה הממוצע של המספרים 2, 4 ו-6?",
-                options: ["4", "3", "12", "6"],
-                correct: 0,
+                q: "ממוצע: ציוני המבחנים הם: 80, 90, 100. מה הממוצע?",
+                options: ["85", "90", "95", "100"],
+                correct: 1,
                 difficulty: 1,
-                explanation: "לחישוב ממוצע נחבר את כולם: 2+4+6 = 12. יש לנו 3 מספרים, אז 12 לחלק ל-3 נותן 4."
+                explanation: "קל ופשוט: הסכום הוא 270. נחלק ב-3 ונקבל 90. הממוצע יושב בול באמצע כי המספרים בקפיצות קבועות."
             },
             {
-                q: "חציון: מהו החציון של קבוצת המספרים הבאה: 1, 9, 3, 7, 5?",
-                options: ["9", "5", "3", "25"],
+                q: "חציון: מה החציון של: 2, 200, 5?",
+                options: ["200", "5", "69", "2"],
                 correct: 1,
                 difficulty: 2,
-                explanation: "כדי למצוא חציון חייבים קודם לסדר מהקטן לגדול! 1, 3, 5, 7, 9. המספר שיושב בדיוק באמצע הוא 5."
+                explanation: "לא להתבלבל! קודם מסדרים: 2, 5, 200. האמצעי הוא 5. (ה-200 הגבוה לא משפיע על החציון, רק על הממוצע)."
             },
             {
-                q: "חשיבה קדימה: יעל קיבלה במבחן הראשון 80 ובמבחן השני 100. איזה ציון היא צריכה לקבל במבחן השלישי כדי שהממוצע הסופי שלה יהיה בדיוק 90?",
-                options: ["80", "100", "90", "85"],
+                q: "חציון זוגי: מה החציון של הרשימה: 4, 6, 8, 10?",
+                options: ["6", "8", "7", "5"],
                 correct: 2,
                 difficulty: 3,
-                explanation: "הממוצע של 80 ו-100 הוא כבר 90. לכן, כל עוד המבחן הנוסף יהיה 90, הממוצע יישאר בדיוק 90! חישוב: (80+100+90) חלקי 3 שווה 270 חלקי 3 שווה 90."
+                explanation: "יש לנו מספר זוגי של איברים. האמצע הוא בין 6 ל-8. עושים ממוצע לשניהם: (6+8)/2 = 7."
+            },
+            {
+                q: "מחשבה לאחור: הממוצע של שני מספרים הוא 10. מספר אחד הוא 6. מה המספר השני?",
+                options: ["4", "14", "12", "16"],
+                correct: 1,
+                difficulty: 3,
+                explanation: "אם הממוצע הוא 10, הסכום של שניהם חייב להיות 20 (כי 20/2=10). אם אחד הוא 6, השני חייב להיות 14."
+            },
+            {
+                q: "השפעה: אם נוסיף לקבוצה מספר ענק (למשל מיליון), מי ישתנה יותר?",
+                options: ["החציון ישתנה המון", "הממוצע ישתנה המון", "אף אחד לא ישתנה", "שניהם ישתנו אותו דבר"],
+                correct: 1,
+                difficulty: 3,
+                explanation: "הממוצע 'רגיש' למספרים קיצוניים ויקפוץ למעלה. החציון בקושי יזוז כי הוא רק מסתכל על המיקום האמצעי."
             }
         ]
     };
 
-    // בניית השאלות על המסך
     function renderQuestions() {
         for (const topic in quizData) {
             const container = document.getElementById(`q-${topic}`);
+            if(!container) continue; 
+            
+            container.innerHTML = ''; // ניקוי שאלות קודמות אם יש
+            
             quizData[topic].forEach((q, index) => {
                 const diffLabels = ['קל', 'בינוני', 'מאתגר'];
                 
@@ -479,13 +492,11 @@
         }
     }
 
-    // בדיקת התשובה של יעל
     function checkAnswer(topic, qIndex, selectedOpt, btnElement) {
         const question = quizData[topic][qIndex];
         const card = document.getElementById(`${topic}-card-${qIndex}`);
         const feedback = document.getElementById(`feedback-${topic}-${qIndex}`);
         
-        // Disable all buttons in this question
         const buttons = card.querySelectorAll('.option-btn');
         buttons.forEach(b => {
             b.disabled = true;
@@ -494,21 +505,18 @@
         });
 
         if (selectedOpt === question.correct) {
-            // Correct Answer
             btnElement.classList.add('correct-ans');
             feedback.className = 'feedback-msg success';
-            feedback.textContent = 'אלופה יעל! תשובה מדויקת! 🎉 (+10 נקודות)';
-            updateScore(10);
+            feedback.textContent = `נכון מאוד יעל! 🌟 (+${question.difficulty * 10} נקודות)`;
+            updateScore(question.difficulty * 10);
         } else {
-            // Wrong Answer
             btnElement.classList.add('wrong-ans');
-            buttons[question.correct].classList.add('correct-ans'); // Show correct one
+            buttons[question.correct].classList.add('correct-ans'); 
             feedback.className = 'feedback-msg error';
-            feedback.innerHTML = `<strong>לא נורא, לומדים מזה!</strong><br>${question.explanation}`;
+            feedback.innerHTML = `<strong>אופס, לא בדיוק...</strong><br>${question.explanation}`;
         }
     }
 
-    // הפעלה ראשונית
     window.onload = renderQuestions;
 </script>
 
