@@ -133,3 +133,443 @@
         .visual-card {
             background: white;
             border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(108, 92, 231, 0.1);
+            border: 1px solid rgba(108, 92, 231, 0.1);
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .tag.calc { background: #e0f7fa; color: #0097a7; }
+        .tag.logic { background: #f3e5f5; color: #9c27b0; }
+        .tag.real { background: #fff3e0; color: #e67e22; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .option-btn.correct {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .option-btn.wrong {
+            background: var(--error);
+            color: white;
+            border-color: var(--error);
+            opacity: 0.5;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f1f2f6;
+            border-right: 4px solid var(--primary);
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #dfe6e9;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: var(--success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+    </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="container">
+    <header>
+        <h1>האקדמיה של יעל 3.0 🎓</h1>
+        <p>שאלות מגוונות, בעיות מילוליות והרבה אתגר!</p>
+        
+        <div class="stats-bar">
+            <div class="stat-item" id="score-box">ניקוד: 0</div>
+            <div class="stat-item" id="streak-box">רצף תשובות: 0 🔥</div>
+        </div>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" onclick="switchSection('pythagoras')">פיתגורס מתקדם</button>
+        <button class="nav-btn" onclick="switchSection('trig')">טריגו' מעשי</button>
+        <button class="nav-btn" onclick="switchSection('shift')">זוויות וגיאומטריה</button>
+        <button class="nav-btn" onclick="switchSection('stats')">סטטיסטיקה למתקדמים</button>
+    </nav>
+
+    <main id="pythagoras" class="section active">
+        <h2>משפט פיתגורס: מעבר למשולש הרגיל</h2>
+        <div class="visual-card">
+            <h3>טיפ לפתרון: חפשי את המשולש המסתתר!</h3>
+            <p>בתוך מלבן, מעוין, או טרפז שווה שוקיים - תמיד מסתתר משולש ישר זווית.</p>
+            <div class="progress-container"><div class="progress-bar" id="prog-pythagoras"></div></div>
+        </div>
+        <div id="q-pythagoras"></div>
+    </main>
+
+    <main id="trig" class="section">
+        <h2>טריגונומטריה בחיי היום-יום</h2>
+        <div class="visual-card">
+            <h3>זווית גובה וזווית עומק</h3>
+            <p>כשאנחנו מסתכלים למעלה (מטוס) זו זווית גובה. כשאנחנו מסתכלים למטה (ממגדל) זו זווית עומק.</p>
+            <div class="progress-container"><div class="progress-bar" id="prog-trig"></div></div>
+        </div>
+        <div id="q-trig"></div>
+    </main>
+
+    <main id="shift" class="section">
+        <h2>Shift: חקירת זוויות</h2>
+        <div class="visual-card">
+            <h3>הגיון מתמטי</h3>
+            <p>אם הצלעות שוות -> הזווית היא 45 מעלות.<br>אם הניצב שמול הזווית הוא חצי מהיתר -> הזווית היא 30 מעלות.</p>
+            <div class="progress-container"><div class="progress-bar" id="prog-shift"></div></div>
+        </div>
+        <div id="q-shift"></div>
+    </main>
+
+    <main id="stats" class="section">
+        <h2>סטטיסטיקה: חשיבה עמוקה</h2>
+        <div class="visual-card">
+            <h3>משחק המספרים</h3>
+            <p>איך מספר אחד חריג יכול להרוס את הממוצע, אבל לא להזיז לחציון?</p>
+            <div class="progress-container"><div class="progress-bar" id="prog-stats"></div></div>
+        </div>
+        <div id="q-stats"></div>
+    </main>
+
+</div>
+
+<script>
+    // --- Data Structure ---
+    const quizData = {
+        pythagoras: [
+            {
+                type: "real",
+                q: "שאלה מילולית: דני הלך 12 ק\"מ צפונה, ואז פנה ימינה והלך 5 ק\"מ מזרחה. מה המרחק בקו אווירי מנקודת ההתחלה?",
+                options: ["17 ק\"מ", "13 ק\"מ", "7 ק\"מ", "10 ק\"מ"],
+                correct: 1,
+                exp: "מצוין! נוצר משולש ישר זווית עם ניצבים 12 ו-5. לפי פיתגורס: 144 + 25 = 169. השורש של 169 הוא 13."
+            },
+            {
+                type: "logic",
+                q: "במלבן, אורך הצלע הארוכה הוא 8 ס\"מ ואורך האלכסון הוא 10 ס\"מ. מהו רוחב המלבן?",
+                options: ["6 ס\"מ", "2 ס\"מ", "18 ס\"מ", "4.5 ס\"מ"],
+                correct: 0,
+                exp: "האלכסון הוא היתר! אז עושים פיתגורס הפוך: 10² פחות 8² שווה 100-64=36. השורש של 36 הוא 6."
+            },
+            {
+                type: "calc",
+                q: "נתון מעוין שהאלכסונים שלו הם באורך 10 ו-24. מה אורך צלע המעוין?",
+                options: ["13", "17", "26", "12"],
+                correct: 0,
+                exp: "שאלה קלאסית למבחן! האלכסונים במעוין חוצים זה את זה ומאונכים. נוצר משולש ישר זווית עם ניצבים שהם *חצי* מהאלכסונים: 5 ו-12. היתר (צלע המעוין) הוא 13."
+            },
+            {
+                type: "real",
+                q: "סולם באורך 5 מטר נשען על קיר. בסיס הסולם נמצא במרחק 3 מטר מהקיר. אם נקרב את הסולם במטר אחד לקיר (למרחק 2 מטר), לאיזה גובה הוא יגיע?",
+                options: ["בערך 4.58 מטר", "4 מטר בדיוק", "5 מטר", "3.5 מטר"],
+                correct: 0,
+                exp: "נחשב מחדש: היתר הוא 5, הניצב החדש הוא 2. 25 פחות 4 שווה 21. שורש של 21 הוא בערך 4.58."
+            }
+        ],
+        trig: [
+            {
+                type: "real",
+                q: "מטוס ממריא בזווית של 30 מעלות. כשהוא עבר מרחק אווירי (יתר) של 2 קילומטר, באיזה גובה הוא נמצא?",
+                options: ["1 ק\"מ", "2 ק\"מ", "1.73 ק\"מ", "0.5 ק\"מ"],
+                correct: 0,
+                exp: "הגובה הוא הניצב *שמול* הזווית. יש לנו יתר וזווית. Sin(30) = 0.5. לכן הגובה הוא חצי מהיתר, כלומר 1 ק\"מ בדיוק."
+            },
+            {
+                type: "calc",
+                q: "במשולש שווה שוקיים, הגובה לבסיס יוצר שני משולשים ישרי זווית. אם זווית הבסיס היא 70 מעלות והשוק (היתר) היא 10. מה גובה המשולש?",
+                options: ["Sin(70) * 10", "Cos(70) * 10", "Tan(70) * 10", "10 / Sin(70)"],
+                correct: 0,
+                exp: "הגובה הוא הניצב *שמול* ה-70 מעלות. יש לנו יתר (10). לכן משתמשים ב-Sin. התשובה היא 10 כפול sin(70)."
+            },
+            {
+                type: "real",
+                q: "עמוד בגובה 10 מטר מטיל צל. זווית השמש היא 45 מעלות. מה אורך הצל?",
+                options: ["10 מטר", "5 מטר", "20 מטר", "15 מטר"],
+                correct: 0,
+                exp: "טריק! בזווית 45 מעלות, ה-Tan הוא 1. זה אומר שהניצב מול (העמוד) שווה לניצב ליד (הצל). לכן הצל הוא בדיוק 10 מטר."
+            },
+            {
+                type: "logic",
+                q: "מה קורה לערך של ה-Sin ככל שהזווית גדלה מ-0 ל-90 מעלות?",
+                options: ["הוא גדל", "הוא קטן", "הוא נשאר אותו דבר", "הוא הופך לשלילי"],
+                correct: 0,
+                exp: "שאלה מעולה להבנה. כשהזווית גדלה, הניצב ש*מול* הזווית מתארך, ולכן הסינוס גדל (מ-0 ועד 1)."
+            }
+        ],
+        shift: [
+            {
+                type: "logic",
+                q: "יש לנו משולש ישר זווית. הניצב מול הזווית הוא 4, והיתר הוא 8. בלי מחשבון - מה גודל הזווית?",
+                options: ["30 מעלות", "60 מעלות", "45 מעלות", "90 מעלות"],
+                correct: 0,
+                exp: "כלל זהב: אם הניצב מול שווה בדיוק לחצי מהיתר (4 מתוך 8), הזווית היא תמיד 30 מעלות."
+            },
+            {
+                type: "calc",
+                q: "שיפוע של כביש: על כל התקדמות של 100 מטר (ליד), הכביש עולה ב-10 מטרים (מול). איזו פעולה תגלה את זווית השיפוע?",
+                options: ["Shift Tan (10/100)", "Shift Sin (10/100)", "Shift Cos (10/100)", "Tan (100/10)"],
+                correct: 0,
+                exp: "יש לנו 'מול' (העלייה) ו-'ליד' (המרחק האופקי). זה טנגנס. כדי למצוא זווית עושים Shift Tan."
+            },
+            {
+                type: "real",
+                q: "ילד מעיף עפיפון. החוט באורך 50 מטר (יתר) והעפיפון מרחף בדיוק מעל עץ שנמצא במרחק 30 מטר מהילד (ליד). מה זווית העפיפון?",
+                options: ["Shift Cos (30/50)", "Shift Sin (30/50)", "Shift Tan (30/50)", "Shift Cos (50/30)"],
+                correct: 0,
+                exp: "נכון! העץ הוא 'ליד' הילד. החוט הוא היתר. ליד ויתר זה Cosine."
+            }
+        ],
+        stats: [
+            {
+                type: "logic",
+                q: "בכיתה יש 5 תלמידים. הציונים הם: 60, 70, 80, 90, 100. הגיע תלמיד חדש עם ציון 0. מה יקרה?",
+                options: ["הממוצע ירד חזק, החציון ירד קצת", "החציון ירד חזק, הממוצע לא ישתנה", "שניהם לא ישתנו", "הממוצע יעלה"],
+                correct: 0,
+                exp: "האפס מושך את הממוצע חזק למטה (כי הוא נכנס לסכום). החציון רק זז מקום אחד שמאלה ולכן משתנה הרבה פחות."
+            },
+            {
+                type: "calc",
+                q: "הממוצע של 3 מספרים הוא 10. הוספנו מספר רביעי שערכו 10. מה הממוצע החדש?",
+                options: ["10", "12.5", "7.5", "40"],
+                correct: 0,
+                exp: "אם מוסיפים לקבוצה איבר ששווה בדיוק לממוצע שלהם - הממוצע לא משתנה! הוא נשאר 10."
+            },
+            {
+                type: "logic",
+                q: "מה אומר לנו החציון שהממוצע לא מספר?",
+                options: ["איפה נמצא ה'אמצע' האמיתי של האנשים, בלי שמספרים קיצוניים ישפיעו", "מה הסכום הכולל", "כמה מספרים יש", "מי המספר הכי גבוה"],
+                correct: 0,
+                exp: "בדיוק. חציון מצוין כשיש נתונים קיצוניים (למשל משכורות: אם ביל גייטס נכנס לחדר, הממוצע קופץ אבל החציון נשאר הגיוני)."
+            }
+        ]
+    };
+
+    // --- Logic ---
+    let state = {
+        score: 0,
+        streak: 0,
+        progress: { pythagoras: 0, trig: 0, shift: 0, stats: 0 }
+    };
+
+    function switchSection(id) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.target.classList.add('active');
+        renderQuestions(id);
+    }
+
+    function renderQuestions(topic) {
+        const container = document.getElementById(`q-${topic}`);
+        if(container.innerHTML !== "") return; // Don't re-render if exists
+
+        const questions = quizData[topic];
+        let html = '';
+
+        questions.forEach((item, idx) => {
+            const tags = {
+                real: "שאלה מהחיים",
+                calc: "חישוב",
+                logic: "הבנה והיגיון"
+            };
+
+            html += `
+            <div class="question-card" id="card-${topic}-${idx}">
+                <span class="tag ${item.type}">${tags[item.type]}</span>
+                <h3>${item.q}</h3>
+                <div class="options-grid">
+                    ${item.options.map((opt, optIdx) => 
+                        `<button class="option-btn" onclick="handleAnswer('${topic}', ${idx}, ${optIdx}, this)">${opt}</button>`
+                    ).join('')}
+                </div>
+                <div class="explanation" id="exp-${topic}-${idx}">
+                    <strong>הסבר:</strong> ${item.exp}
+                </div>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+        updateProgressBar(topic);
+    }
+
+    function handleAnswer(topic, qIdx, optIdx, btn) {
+        const question = quizData[topic][qIdx];
+        const card = document.getElementById(`card-${topic}-${qIdx}`);
+        const allBtns = card.querySelectorAll('.option-btn');
+        const expBox = document.getElementById(`exp-${topic}-${qIdx}`);
+
+        // Prevent double answering
+        if(card.getAttribute('data-answered')) return;
+        card.setAttribute('data-answered', 'true');
+
+        if(optIdx === question.correct) {
+            btn.classList.add('correct');
+            state.score += 10 + (state.streak * 2); // Bonus for streak
+            state.streak++;
+            state.progress[topic]++;
+            fireConfetti(btn); // Visual reward
+        } else {
+            btn.classList.add('wrong');
+            allBtns[question.correct].classList.add('correct'); // Show right answer
+            state.streak = 0;
+        }
+
+        // UI Updates
+        document.getElementById('score-box').textContent = `ניקוד: ${state.score}`;
+        document.getElementById('streak-box').textContent = `רצף תשובות: ${state.streak} 🔥`;
+        expBox.classList.add('show');
+        updateProgressBar(topic);
+
+        // Check if finished topic
+        if(state.progress[topic] === quizData[topic].length) {
+            setTimeout(() => {
+                alert(`כל הכבוד יעל! סיימת את כל השאלות בנושא ${topic} בהצלחה! 🎉`);
+                massiveConfetti();
+            }, 1000);
+        }
+    }
+
+    function updateProgressBar(topic) {
+        const total = quizData[topic].length;
+        const current = state.progress[topic];
+        const pct = (current / total) * 100;
+        document.getElementById(`prog-${topic}`).style.width = `${pct}%`;
+    }
+
+    // --- Simple Confetti Effect ---
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function fireConfetti(element) {
+        const rect = element.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top;
+        
+        for(let i=0; i<30; i++) {
+            particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 1) * 10 - 5,
+                color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                life: 100
+            });
+        }
+    }
+
+    function massiveConfetti() {
+        for(let i=0; i<200; i++) {
+            particles.push({
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2,
+                vx: (Math.random() - 0.5) * 20,
+                vy: (Math.random() - 0.5) * 20,
+                color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                life: 150
+            });
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach((p, index) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.2; // Gravity
+            p.life--;
+            
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            if(p.life <= 0) particles.splice(index, 1);
+        });
+        
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Initialize first section
+    renderQuestions('pythagoras');
+
+</script>
+
+</body>
+</html>
